@@ -111,10 +111,10 @@ Alembic does not own marts, features, or serving SQL transformations. Those stay
 - Backend: product-facing APIs and future orchestration over curated/serving data
 - ML API: inference contracts and future model-serving behavior
 - Jobs: filesystem ingestion, SQL refreshes, model training, and batch scoring
-- Superset: BI consumer of `mart` and `serving`, using a dedicated read-only Postgres user
+- Superset: separate metadata DB plus a dedicated read-only analytics connection into `mart` and `serving`
 - Frontend: placeholder MVP surface for dashboard, customer, churn, recommendations, and forecast views
 
-For the scaffold, Superset metadata still lives in PostgreSQL, while dashboard datasets should be registered against the BI read-only DSN and limited to `mart` and `serving`.
+For the scaffold, Superset metadata lives in a separate PostgreSQL database, while dashboard datasets should be registered against the BI read-only DSN and limited to `mart` and `serving`.
 
 ## Parallel Team Split
 

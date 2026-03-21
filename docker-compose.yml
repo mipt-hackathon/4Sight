@@ -8,6 +8,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       BI_READONLY_USER: ${BI_READONLY_USER:-bi_readonly}
       BI_READONLY_PASSWORD: ${BI_READONLY_PASSWORD:-bi_readonly}
+      SUPERSET_METADATA_DB: ${SUPERSET_METADATA_DB:-superset_metadata}
     ports:
       - "${POSTGRES_PORT}:5432"
     volumes:
