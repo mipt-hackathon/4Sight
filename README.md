@@ -73,7 +73,6 @@ Raw CSVs stay on the filesystem and are parsed by ETL jobs. PostgreSQL stores on
 - Backend docs: [http://localhost:8000/docs](http://localhost:8000/docs)
 - ML API docs: [http://localhost:8001/docs](http://localhost:8001/docs)
 - Superset: [http://localhost:8088](http://localhost:8088)
-- pgAdmin: [http://localhost:5050](http://localhost:5050)
 
 ## Migration Flow
 

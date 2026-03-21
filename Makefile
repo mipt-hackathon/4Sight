@@ -13,7 +13,7 @@ bootstrap: ensure-env
 	$(MAKE) migrate
 
 up: ensure-env
-	$(COMPOSE) up --build -d postgres redis backend ml-api frontend superset pgadmin
+	$(COMPOSE) up --build -d postgres redis backend ml-api frontend superset
 
 down:
 	$(COMPOSE) down

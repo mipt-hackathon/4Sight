@@ -27,7 +27,6 @@ flowchart TD
     mlapi["ml-api"]
     frontend["frontend"]
     superset["superset"]
-    pgadmin["pgadmin"]
     etl["etl"]
     marts["marts-builder"]
     features["feature-builder"]
@@ -37,7 +36,6 @@ flowchart TD
     postgres --> backend
     postgres --> mlapi
     postgres --> superset
-    postgres --> pgadmin
     postgres --> etl
     postgres --> marts
     postgres --> features
