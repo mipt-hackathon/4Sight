@@ -17,7 +17,7 @@ This repository is the initial scaffold for a retail analytics application that 
 
 ## Intentionally Stubbed
 
-- No real ETL parsing or transformations
+- No cleaning, deduplication, or business transformations yet
 - No real marts, features, or serving SQL
 - No trained models or inference logic
 - No auth system
@@ -34,7 +34,7 @@ This repository is the initial scaffold for a retail analytics application that 
 - customer identity resolution is a later implementation task
 - the intended warehouse lifecycle is `clean -> mart -> feature -> serving`
 
-Raw CSVs stay on the filesystem and are parsed by ETL jobs. PostgreSQL stores only cleaned, curated, analytical, feature, and serving layers.
+Raw CSVs stay on the filesystem and are parsed by ETL jobs. The current ETL implementation only copies CSV rows into `clean.transactions_wide_import` and `clean.events_import` with original columns preserved, so the next team member can implement cleaning on top of a concrete landing point.
 
 ## Top-Level Ownership
 
@@ -111,6 +111,7 @@ Alembic does not own marts, features, or serving SQL transformations. Those stay
 - Backend: product-facing APIs and future orchestration over curated/serving data
 - ML API: inference contracts and future model-serving behavior
 - Jobs: filesystem ingestion, SQL refreshes, model training, and batch scoring
+- Current ETL demo: load `data/raw/*.csv` into `clean.*_import` tables without cleaning
 - Superset: separate metadata DB plus a dedicated read-only analytics connection into `mart` and `serving`
 - Frontend: placeholder MVP surface for dashboard, customer, churn, recommendations, and forecast views
 
