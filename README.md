@@ -69,10 +69,10 @@ Raw CSVs stay on the filesystem and are parsed by ETL jobs. PostgreSQL stores on
 
 3. Open local services:
 
-- Frontend: [http://localhost:3000](http://localhost:3000)
-- Backend docs: [http://localhost:8000/docs](http://localhost:8000/docs)
-- ML API docs: [http://localhost:8001/docs](http://localhost:8001/docs)
-- Superset: [http://localhost:8088](http://localhost:8088)
+- Frontend: [http://localhost:13000](http://localhost:13000)
+- Backend docs: [http://localhost:18000/docs](http://localhost:18000/docs)
+- ML API docs: [http://localhost:18001/docs](http://localhost:18001/docs)
+- Superset: [http://localhost:18088](http://localhost:18088)
 
 ## Migration Flow
 
