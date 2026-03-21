@@ -9,5 +9,6 @@ superset fab create-admin \
   --email "${SUPERSET_ADMIN_EMAIL}" \
   --password "${SUPERSET_ADMIN_PASSWORD}" || true
 superset init
+echo "Superset metadata DB is ready. Register ${SUPERSET_ANALYTICS_DATABASE_URI} as the BI read-only analytics connection for mart/serving."
 
 exec superset run -h 0.0.0.0 -p 8088 --with-threads

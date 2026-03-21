@@ -28,8 +28,14 @@ def main() -> None:
     settings = get_settings()
     configure_logging(settings.app_log_level)
 
+    logger.info("Running ETL scaffold for service=%s", settings.app_name)
     logger.info("Starting ETL scaffold for source_dir=%s", args.source_dir)
-    inspect_source_files(args.source_dir)
+    logger.info(
+        "Assumption: raw CSVs stay on disk and are never mirrored as raw PostgreSQL tables."
+    )
+    logger.info("Target: curated clean-layer tables in PostgreSQL after parsing and validation.")
+    source_files = inspect_source_files(args.source_dir)
+    logger.info("Discovered source CSV files: %s", source_files or "none yet")
     validate_inputs(args.source_dir)
     extracted_artifacts = run_extract(args.source_dir)
     transformed_artifacts = run_transform(extracted_artifacts)

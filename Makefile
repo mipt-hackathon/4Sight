@@ -1,32 +1,57 @@
 SHELL := /bin/bash
 
-COMPOSE := docker compose --env-file .env
+ENV_FILE := .env
+COMPOSE := docker compose --env-file $(ENV_FILE)
 
-.PHONY: up down logs etl marts features train score pipeline test lint format reset-db
+.PHONY: ensure-env bootstrap up down logs migrate current backend-shell ml-shell db-shell psql etl marts features train score pipeline test lint format reset-db
 
-up:
-	cp -n .env.example .env 2>/dev/null || true
+ensure-env:
+	cp -n .env.example $(ENV_FILE) 2>/dev/null || true
+
+bootstrap: ensure-env
+	$(COMPOSE) up -d postgres redis
+	$(MAKE) migrate
+
+up: ensure-env
 	$(COMPOSE) up --build -d postgres redis backend ml-api frontend superset pgadmin
 
 down:
 	$(COMPOSE) down
 
-logs:
+logs: ensure-env
 	$(COMPOSE) logs -f --tail=200
 
-etl:
+migrate: ensure-env
+	$(COMPOSE) run --rm backend alembic upgrade head
+
+current: ensure-env
+	$(COMPOSE) run --rm backend alembic current
+
+backend-shell: ensure-env
+	$(COMPOSE) run --rm backend bash
+
+ml-shell: ensure-env
+	$(COMPOSE) run --rm ml-api bash
+
+db-shell: ensure-env
+	$(COMPOSE) exec postgres sh
+
+psql: ensure-env
+	$(COMPOSE) exec postgres sh -lc 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"'
+
+etl: ensure-env
 	$(COMPOSE) run --rm etl
 
-marts:
+marts: ensure-env
 	$(COMPOSE) run --rm marts-builder
 
-features:
+features: ensure-env
 	$(COMPOSE) run --rm feature-builder
 
-train:
+train: ensure-env
 	$(COMPOSE) run --rm train
 
-score:
+score: ensure-env
 	$(COMPOSE) run --rm batch-scoring
 
 pipeline:
@@ -48,3 +73,4 @@ format:
 reset-db:
 	$(COMPOSE) down -v
 	$(COMPOSE) up -d postgres redis
+	$(MAKE) migrate

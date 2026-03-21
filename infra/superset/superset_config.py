@@ -6,5 +6,10 @@ SQLALCHEMY_DATABASE_URI = os.getenv(
     "SUPERSET_DATABASE_URI",
     "postgresql+psycopg2://retail:retail@postgres:5432/retail_analytics",
 )
+ANALYTICS_DATABASE_URI = os.getenv(
+    "SUPERSET_ANALYTICS_DATABASE_URI",
+    "postgresql+psycopg2://bi_readonly:bi_readonly@postgres:5432/retail_analytics",
+)
 
-# TODO: Register PostgreSQL datasets, charts, and dashboards once marts/serving tables exist.
+# TODO: Register ANALYTICS_DATABASE_URI inside Superset.
+# TODO: Keep dashboard datasets on mart/serving only.

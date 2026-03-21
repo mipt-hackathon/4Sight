@@ -3,6 +3,8 @@
 This migration intentionally avoids business marts/features/serving logic.
 """
 
+import os
+
 import sqlalchemy as sa
 
 from alembic import op
@@ -11,6 +13,7 @@ revision = "202603210001"
 down_revision = None
 branch_labels = None
 depends_on = None
+BI_READONLY_USER = os.getenv("BI_READONLY_USER", "bi_readonly")
 
 
 def upgrade() -> None:
@@ -79,9 +82,55 @@ def upgrade() -> None:
         unique=True,
         schema="serving",
     )
+    op.execute(
+        f"""
+        DO $$
+        BEGIN
+            IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '{BI_READONLY_USER}') THEN
+                EXECUTE format('GRANT USAGE ON SCHEMA mart TO %I', '{BI_READONLY_USER}');
+                EXECUTE format('GRANT USAGE ON SCHEMA serving TO %I', '{BI_READONLY_USER}');
+                EXECUTE format(
+                    'GRANT SELECT ON ALL TABLES IN SCHEMA mart TO %I',
+                    '{BI_READONLY_USER}'
+                );
+                EXECUTE format(
+                    'GRANT SELECT ON ALL TABLES IN SCHEMA serving TO %I',
+                    '{BI_READONLY_USER}'
+                );
+                EXECUTE format(
+                    'ALTER DEFAULT PRIVILEGES IN SCHEMA mart GRANT SELECT ON TABLES TO %I',
+                    '{BI_READONLY_USER}'
+                );
+                EXECUTE format(
+                    'ALTER DEFAULT PRIVILEGES IN SCHEMA serving GRANT SELECT ON TABLES TO %I',
+                    '{BI_READONLY_USER}'
+                );
+            END IF;
+        END
+        $$;
+        """
+    )
 
 
 def downgrade() -> None:
+    op.execute(
+        f"""
+        DO $$
+        BEGIN
+            IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '{BI_READONLY_USER}') THEN
+                EXECUTE format(
+                    'ALTER DEFAULT PRIVILEGES IN SCHEMA mart REVOKE SELECT ON TABLES FROM %I',
+                    '{BI_READONLY_USER}'
+                );
+                EXECUTE format(
+                    'ALTER DEFAULT PRIVILEGES IN SCHEMA serving REVOKE SELECT ON TABLES FROM %I',
+                    '{BI_READONLY_USER}'
+                );
+            END IF;
+        END
+        $$;
+        """
+    )
     op.drop_index("ux_model_registry_model_version", table_name="model_registry", schema="serving")
     op.drop_index("ix_model_registry_model_name", table_name="model_registry", schema="serving")
     op.drop_table("model_registry", schema="serving")

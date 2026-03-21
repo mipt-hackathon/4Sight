@@ -1,6 +1,6 @@
 # Architecture Overview
 
-This scaffold separates application APIs, ML interfaces, jobs, SQL, and BI assets so the team can build in parallel without blurring ownership.
+This scaffold keeps backend, ML, BI, SQL, and batch responsibilities separate so the team can implement in parallel without inventing structure later.
 
 ## High-Level Architecture
 
@@ -9,10 +9,10 @@ flowchart LR
     raw["Mounted CSV Files\n(data.csv, events.csv)"] --> etl["ETL Jobs"]
     etl --> pg["PostgreSQL\nclean / mart / feature / serving"]
     pg --> backend["FastAPI Backend"]
-    pg --> bi["Apache Superset"]
+    pg --> superset["Apache Superset"]
     pg --> ml["FastAPI ML API"]
     ml --> backend
-    backend --> web["Next.js Frontend"]
+    backend --> frontend["Next.js Frontend"]
     redis["Redis"] --> backend
     redis --> ml
 ```
@@ -52,8 +52,8 @@ flowchart TD
 
 ## Ownership Boundaries
 
-- Backend owns product-facing API composition.
-- ML API owns inference contracts and future model loading.
-- Jobs own offline/batch workflows.
+- Backend owns product-facing API composition and future orchestration.
+- ML API owns inference contracts and future artifact loading.
+- Jobs own filesystem ingestion and batch refreshes.
 - SQL folders own analytical dataset definitions.
-- Superset owns BI consumption, not source-of-truth business logic.
+- Superset consumes `mart` and `serving` through a read-only BI user.

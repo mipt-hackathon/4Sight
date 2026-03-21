@@ -1,32 +1,32 @@
 # Data Flow
 
-The system is designed around mounted files as the raw source and PostgreSQL as the home for curated analytical layers only.
+The system treats the filesystem as the raw source and PostgreSQL as the home for curated analytical layers only.
 
 ## End-to-End Flow
 
 ```mermaid
 flowchart LR
-    raw["Filesystem Mounted CSVs"] --> parse["ETL Parse + Validate"]
-    parse --> clean["PostgreSQL clean schema"]
-    clean --> mart["PostgreSQL mart schema"]
-    mart --> feature["PostgreSQL feature schema"]
+    raw["Mounted CSV Files"] --> parse["ETL Parse + Validate"]
+    parse --> clean["clean schema"]
+    clean --> mart["mart schema"]
+    mart --> feature["feature schema"]
     feature --> train["Training Job"]
-    feature --> ml["ML API / Batch Scoring"]
+    feature --> score["ML API / Batch Scoring"]
     train --> artifacts["Model Artifacts"]
-    artifacts --> ml
-    ml --> serving["PostgreSQL serving schema"]
-    serving --> backend["Backend API"]
-    serving --> superset["Superset Dashboards"]
-    mart --> backend
-    mart --> superset
+    artifacts --> score
+    score --> serving["serving schema"]
+    mart --> backend["Backend API"]
+    serving --> backend
+    mart --> superset["Superset"]
+    serving --> superset
 ```
 
 ## PostgreSQL Layer Design
 
 ```mermaid
 flowchart TD
-    clean["clean\nstandardized and validated base records"]
-    mart["mart\nanalytics-friendly reusable marts"]
+    clean["clean\nvalidated base records"]
+    mart["mart\nanalytics-friendly datasets"]
     feature["feature\nmodel-ready feature tables"]
     serving["serving\napplication and BI outputs"]
 
@@ -36,8 +36,11 @@ flowchart TD
     mart --> serving
 ```
 
-## Notes
+## Data Assumptions
 
-- `data.csv` is expected to be wide and denormalized.
-- `events.csv` can contain missing `user_id` values and encoding issues.
-- Raw files stay on disk; ETL jobs are responsible for parsing and loading curated structures.
+- `data.csv` is a wide denormalized transactional dataset
+- `events.csv` is a behavioral event log
+- `events.csv` can contain missing `user_id`
+- encoding cleanup may be required during ETL
+- customer identity resolution will be implemented later
+- raw CSV files stay on disk and are not loaded into PostgreSQL as raw replica tables

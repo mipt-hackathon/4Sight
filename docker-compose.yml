@@ -6,6 +6,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      BI_READONLY_USER: ${BI_READONLY_USER:-bi_readonly}
+      BI_READONLY_PASSWORD: ${BI_READONLY_PASSWORD:-bi_readonly}
     ports:
       - "${POSTGRES_PORT}:5432"
     volumes:
@@ -45,6 +47,7 @@ services:
       POSTGRES_DSN: ${POSTGRES_DSN}
       ALEMBIC_DATABASE_URL: ${ALEMBIC_DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
+      BI_READONLY_USER: ${BI_READONLY_USER:-bi_readonly}
       PYTHONPATH: /workspace/libs/common/src
     ports:
       - "${BACKEND_PORT}:8000"
@@ -100,6 +103,7 @@ services:
       - "${FRONTEND_PORT}:3000"
     volumes:
       - ./apps/frontend:/workspace/apps/frontend
+      - frontend_node_modules:/workspace/apps/frontend/node_modules
     depends_on:
       - backend
       - ml-api
@@ -117,7 +121,8 @@ services:
       SUPERSET_ADMIN_LASTNAME: ${SUPERSET_ADMIN_LASTNAME}
       SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL}
       SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
-      SUPERSET_DATABASE_URI: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      SUPERSET_DATABASE_URI: ${SUPERSET_DATABASE_URI:-postgresql+psycopg2://retail:retail@postgres:5432/retail_analytics}
+      SUPERSET_ANALYTICS_DATABASE_URI: ${SUPERSET_ANALYTICS_DATABASE_URI:-postgresql+psycopg2://bi_readonly:bi_readonly@postgres:5432/retail_analytics}
       PYTHONPATH: /app/pythonpath
     command: ["/app/docker/init.sh"]
     ports:
@@ -269,3 +274,4 @@ volumes:
   redis_data:
   pgadmin_data:
   superset_home:
+  frontend_node_modules:
