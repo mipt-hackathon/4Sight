@@ -1,5 +1,4 @@
 import csv
-import hashlib
 import logging
 import uuid
 from datetime import datetime
@@ -51,9 +50,6 @@ def run_load(transformed_artifacts: list[CsvLoadPlan]) -> None:
             _recreate_target_table(connection, plan)
 
         rows_loaded = _copy_rows(engine, plan)
-
-        with engine.begin() as connection:
-            _record_source_file(connection, plan)
 
         logger.info(
             "Load step copied %s rows from %s into clean.%s",
@@ -218,63 +214,6 @@ def _count_rows(engine, table_name: str) -> int:
             text(f'SELECT COUNT(*) FROM clean."{table_name}"')
         ).scalar_one()
     return int(row_count)
-
-
-def _record_source_file(connection: Connection, plan: CsvLoadPlan) -> None:
-    connection.execute(
-        text(
-            """
-            DELETE FROM public.source_files
-            WHERE source_name = :source_name
-              AND file_path <> :file_path
-            """
-        ),
-        {
-            "source_name": plan.source.filename,
-            "file_path": str(plan.source.path),
-        },
-    )
-    connection.execute(
-        text(
-            """
-            INSERT INTO public.source_files (
-                source_name,
-                file_path,
-                file_hash,
-                detected_encoding,
-                ingestion_status
-            )
-            VALUES (
-                :source_name,
-                :file_path,
-                :file_hash,
-                :detected_encoding,
-                :ingestion_status
-            )
-            ON CONFLICT (file_path) DO UPDATE
-            SET
-                source_name = EXCLUDED.source_name,
-                file_hash = EXCLUDED.file_hash,
-                detected_encoding = EXCLUDED.detected_encoding,
-                ingestion_status = EXCLUDED.ingestion_status
-            """
-        ),
-        {
-            "source_name": plan.source.filename,
-            "file_path": str(plan.source.path),
-            "file_hash": _hash_file(plan.source.path),
-            "detected_encoding": plan.encoding,
-            "ingestion_status": "loaded",
-        },
-    )
-
-
-def _hash_file(file_path) -> str:
-    digest = hashlib.sha256()
-    with file_path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def _quote_literal(value: str) -> str:

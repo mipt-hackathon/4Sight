@@ -39,6 +39,8 @@ Raw CSVs stay on the filesystem and are parsed by ETL jobs. The current ETL impl
 - `data.csv` -> `clean.users`, `clean.orders`, `clean.order_items`
 - `events.csv` -> `clean.events`
 
+The scaffold does not persist a separate source-file registry in PostgreSQL. Raw files remain the only source of truth.
+
 What is already handled:
 - structural split by entity
 - typed columns for IDs, timestamps, numerics, booleans, UUIDs, and coordinates

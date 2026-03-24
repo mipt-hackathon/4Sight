@@ -37,26 +37,6 @@ def upgrade() -> None:
     op.create_index("ix_job_runs_status", "job_runs", ["status"], schema="public")
 
     op.create_table(
-        "source_files",
-        sa.Column("id", sa.BigInteger(), primary_key=True, autoincrement=True),
-        sa.Column("source_name", sa.String(length=100), nullable=False),
-        sa.Column("file_path", sa.String(length=500), nullable=False),
-        sa.Column("file_hash", sa.String(length=128), nullable=True),
-        sa.Column("detected_encoding", sa.String(length=64), nullable=True),
-        sa.Column(
-            "ingestion_status", sa.String(length=50), nullable=False, server_default="discovered"
-        ),
-        sa.Column(
-            "created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()
-        ),
-        schema="public",
-    )
-    op.create_index("ix_source_files_source_name", "source_files", ["source_name"], schema="public")
-    op.create_index(
-        "ux_source_files_file_path", "source_files", ["file_path"], unique=True, schema="public"
-    )
-
-    op.create_table(
         "model_registry",
         sa.Column("id", sa.BigInteger(), primary_key=True, autoincrement=True),
         sa.Column("model_name", sa.String(length=100), nullable=False),
@@ -134,10 +114,6 @@ def downgrade() -> None:
     op.drop_index("ux_model_registry_model_version", table_name="model_registry", schema="serving")
     op.drop_index("ix_model_registry_model_name", table_name="model_registry", schema="serving")
     op.drop_table("model_registry", schema="serving")
-
-    op.drop_index("ux_source_files_file_path", table_name="source_files", schema="public")
-    op.drop_index("ix_source_files_source_name", table_name="source_files", schema="public")
-    op.drop_table("source_files", schema="public")
 
     op.drop_index("ix_job_runs_status", table_name="job_runs", schema="public")
     op.drop_index("ix_job_runs_job_name", table_name="job_runs", schema="public")
