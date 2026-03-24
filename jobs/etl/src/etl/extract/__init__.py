@@ -11,11 +11,7 @@ def run_extract(source_dir: str) -> list[CsvSourceFile]:
 
     source_files = discover_source_files(source_dir)
     for source_file in source_files:
-        logger.info(
-            "Extract step registered source file %s -> clean.%s",
-            source_file.path,
-            source_file.table_name,
-        )
+        logger.info("Extract step registered source file %s", source_file.path)
     return source_files
 
 

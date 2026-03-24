@@ -34,7 +34,21 @@ This repository is the initial scaffold for a retail analytics application that 
 - customer identity resolution is a later implementation task
 - the intended warehouse lifecycle is `clean -> mart -> feature -> serving`
 
-Raw CSVs stay on the filesystem and are parsed by ETL jobs. The current ETL implementation only copies CSV rows into `clean.transactions_wide_import` and `clean.events_import` with original columns preserved, so the next team member can implement cleaning on top of a concrete landing point.
+Raw CSVs stay on the filesystem and are parsed by ETL jobs. The current ETL implementation loads directly into typed clean tables:
+
+- `data.csv` -> `clean.users`, `clean.orders`, `clean.order_items`
+- `events.csv` -> `clean.events`
+
+What is already handled:
+- structural split by entity
+- typed columns for IDs, timestamps, numerics, booleans, UUIDs, and coordinates
+- safe deduplication for `users`, `orders`, and `order_items` where the raw file repeats identical entity rows
+
+What is still intentionally deferred:
+- business cleaning rules
+- null-handling policies beyond empty-string to `NULL`
+- customer identity resolution
+- event deduplication or reconciliation
 
 ## Top-Level Ownership
 
@@ -111,7 +125,7 @@ Alembic does not own marts, features, or serving SQL transformations. Those stay
 - Backend: product-facing APIs and future orchestration over curated/serving data
 - ML API: inference contracts and future model-serving behavior
 - Jobs: filesystem ingestion, SQL refreshes, model training, and batch scoring
-- Current ETL demo: load `data/raw/*.csv` into `clean.*_import` tables without cleaning
+- Current ETL demo: load `data/raw/*.csv` directly into typed `clean.*` tables
 - Superset: separate metadata DB plus a dedicated read-only analytics connection into `mart` and `serving`
 - Frontend: placeholder MVP surface for dashboard, customer, churn, recommendations, and forecast views
 

@@ -30,10 +30,9 @@ def main() -> None:
 
     logger.info("Running ETL scaffold for service=%s", settings.app_name)
     logger.info("Starting ETL scaffold for source_dir=%s", args.source_dir)
-    logger.info("Current scope: copy CSV rows into PostgreSQL import tables without cleaning.")
+    logger.info("Current scope: load raw CSVs directly into typed clean tables.")
     logger.info(
-        "Target tables: clean.transactions_wide_import for data.csv "
-        "and clean.events_import for events.csv."
+        "Target tables: clean.users, clean.orders, clean.order_items, and clean.events."
     )
     source_files = inspect_source_files(args.source_dir)
     logger.info("Discovered source CSV files: %s", source_files or "none yet")
@@ -41,7 +40,7 @@ def main() -> None:
     extracted_artifacts = run_extract(args.source_dir)
     transformed_artifacts = run_transform(extracted_artifacts)
     run_load(transformed_artifacts)
-    logger.info("ETL import completed. TODO: implement real cleaning and curated modeling.")
+    logger.info("ETL clean load completed. TODO: implement business cleaning and curated modeling.")
 
 
 if __name__ == "__main__":

@@ -6,11 +6,23 @@ from pathlib import Path
 class CsvSourceFile:
     filename: str
     path: Path
-    table_name: str
 
 
 @dataclass(frozen=True)
-class CsvImportPlan:
+class TableColumnSpec:
+    source_name: str
+    target_name: str
+    type_name: str
+    nullable: bool = True
+    primary_key: bool = False
+
+
+@dataclass(frozen=True)
+class CsvLoadPlan:
     source: CsvSourceFile
     encoding: str
-    header: tuple[str, ...]
+    source_header: tuple[str, ...]
+    target_table: str
+    target_columns: tuple[TableColumnSpec, ...]
+    dedupe_key: str | None = None
+    surrogate_key: str | None = None

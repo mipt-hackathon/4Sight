@@ -1,41 +1,194 @@
 import logging
 
-from etl.models import CsvImportPlan, CsvSourceFile
+from etl.models import CsvLoadPlan, CsvSourceFile, TableColumnSpec
 from etl.parsers import detect_file_encoding, read_csv_header
 
 logger = logging.getLogger(__name__)
 
+DATA_FILE_PLANS: tuple[tuple[str, tuple[TableColumnSpec, ...], str], ...] = (
+    (
+        "users",
+        (
+            TableColumnSpec("user_id", "user_id", "bigint", nullable=False, primary_key=True),
+            TableColumnSpec("gender", "gender", "text"),
+            TableColumnSpec("first_name", "first_name", "text"),
+            TableColumnSpec("last_name", "last_name", "text"),
+            TableColumnSpec("email", "email", "text"),
+            TableColumnSpec("age", "age", "integer"),
+            TableColumnSpec("state", "state", "text"),
+            TableColumnSpec("street_address", "street_address", "text"),
+            TableColumnSpec("postal_code", "postal_code", "text"),
+            TableColumnSpec("city", "city", "text"),
+            TableColumnSpec("country", "country", "text"),
+            TableColumnSpec("traffic_source", "traffic_source", "text"),
+            TableColumnSpec("user_geom", "user_geom", "text"),
+            TableColumnSpec("is_loyal", "is_loyal", "boolean"),
+        ),
+        "user_id",
+    ),
+    (
+        "orders",
+        (
+            TableColumnSpec("order_id", "order_id", "bigint", nullable=False, primary_key=True),
+            TableColumnSpec("user_id", "user_id", "bigint", nullable=False),
+            TableColumnSpec("status", "status", "text"),
+            TableColumnSpec("created_at", "created_at", "timestamptz", nullable=False),
+            TableColumnSpec("returned_at", "returned_at", "timestamptz"),
+            TableColumnSpec("shipped_at", "shipped_at", "timestamptz"),
+            TableColumnSpec("delivered_at", "delivered_at", "timestamptz"),
+            TableColumnSpec("num_of_item", "num_of_item", "integer", nullable=False),
+        ),
+        "order_id",
+    ),
+    (
+        "order_items",
+        (
+            TableColumnSpec(
+                "order_item_id",
+                "order_item_id",
+                "bigint",
+                nullable=False,
+                primary_key=True,
+            ),
+            TableColumnSpec("order_id", "order_id", "bigint", nullable=False),
+            TableColumnSpec("user_id", "user_id", "bigint", nullable=False),
+            TableColumnSpec("product_id", "product_id", "bigint", nullable=False),
+            TableColumnSpec("inventory_item_id", "inventory_item_id", "bigint", nullable=False),
+            TableColumnSpec("sale_price", "sale_price", "numeric", nullable=False),
+            TableColumnSpec("cost", "cost", "numeric", nullable=False),
+            TableColumnSpec("category", "category", "text"),
+            TableColumnSpec("brand", "brand", "text"),
+            TableColumnSpec("retail_price", "retail_price", "numeric", nullable=False),
+            TableColumnSpec("department", "department", "text"),
+            TableColumnSpec("sku", "sku", "text"),
+            TableColumnSpec(
+                "distribution_center_id",
+                "distribution_center_id",
+                "bigint",
+                nullable=False,
+            ),
+            TableColumnSpec("sold_at", "sold_at", "timestamptz"),
+            TableColumnSpec("distribution_center_geom", "distribution_center_geom", "text"),
+            TableColumnSpec("delivery_longitude", "delivery_longitude", "float8"),
+            TableColumnSpec("delivery_latitude", "delivery_latitude", "float8"),
+            TableColumnSpec("warehouse_name", "warehouse_name", "text"),
+            TableColumnSpec("warehouse_longitude", "warehouse_longitude", "float8"),
+            TableColumnSpec("warehouse_latitude", "warehouse_latitude", "float8"),
+            TableColumnSpec("product_name", "product_name", "text"),
+            TableColumnSpec("customer_review", "customer_review", "text"),
+        ),
+        "order_item_id",
+    ),
+)
 
-def run_transform(extracted_artifacts: list[CsvSourceFile]) -> list[CsvImportPlan]:
+EVENTS_PLAN: tuple[TableColumnSpec, ...] = (
+    TableColumnSpec("id", "source_event_id", "bigint", nullable=False),
+    TableColumnSpec("user_id", "user_id", "bigint"),
+    TableColumnSpec("sequence_number", "sequence_number", "integer", nullable=False),
+    TableColumnSpec("session_id", "session_id", "uuid", nullable=False),
+    TableColumnSpec("created_at", "created_at", "timestamptz", nullable=False),
+    TableColumnSpec("ip_address", "ip_address", "text"),
+    TableColumnSpec("city", "city", "text"),
+    TableColumnSpec("state", "state", "text"),
+    TableColumnSpec("postal_code", "postal_code", "text"),
+    TableColumnSpec("browser", "browser", "text"),
+    TableColumnSpec("traffic_source", "traffic_source", "text"),
+    TableColumnSpec("uri", "uri", "text"),
+    TableColumnSpec("event_type", "event_type", "text"),
+)
+
+
+def run_transform(extracted_artifacts: list[CsvSourceFile]) -> list[CsvLoadPlan]:
     """
-    Build explicit import plans without modifying source columns or values.
+    Build direct-to-clean typed load plans from the raw CSV files.
 
-    TODO:
-      - add actual cleaning and type coercion
-      - resolve malformed headers and duplicate columns if they appear
+    Current scope:
+      - split data.csv into users/orders/order_items
+      - load events.csv into clean.events
+      - keep business cleaning, reconciliation, and enrichment for later work
     """
 
-    plans: list[CsvImportPlan] = []
+    plans: list[CsvLoadPlan] = []
     for source in extracted_artifacts:
         encoding = detect_file_encoding(source.path)
         header = read_csv_header(source.path, encoding)
         _validate_header(source.path, header)
 
-        plans.append(
-            CsvImportPlan(
-                source=source,
-                encoding=encoding,
-                header=header,
-            )
-        )
+        file_plans = _build_file_plans(source, encoding, header)
+        plans.extend(file_plans)
+
         logger.info(
-            "Transform step prepared %s columns from %s using encoding=%s",
-            len(header),
+            "Transform step prepared %s target table(s) from %s using encoding=%s",
+            len(file_plans),
             source.filename,
             encoding,
         )
 
     return plans
+
+
+def _build_file_plans(
+    source: CsvSourceFile,
+    encoding: str,
+    header: tuple[str, ...],
+) -> list[CsvLoadPlan]:
+    if source.filename == "data.csv":
+        return [
+            _build_plan(
+                source=source,
+                encoding=encoding,
+                header=header,
+                target_table=table_name,
+                target_columns=target_columns,
+                dedupe_key=dedupe_key,
+            )
+            for table_name, target_columns, dedupe_key in DATA_FILE_PLANS
+        ]
+
+    if source.filename == "events.csv":
+        return [
+            _build_plan(
+                source=source,
+                encoding=encoding,
+                header=header,
+                target_table="events",
+                target_columns=EVENTS_PLAN,
+                surrogate_key="event_row_id",
+            )
+        ]
+
+    raise ValueError(
+        f"Unexpected CSV source {source.path}. This scaffold expects data.csv and events.csv only."
+    )
+
+
+def _build_plan(
+    source: CsvSourceFile,
+    encoding: str,
+    header: tuple[str, ...],
+    target_table: str,
+    target_columns: tuple[TableColumnSpec, ...],
+    dedupe_key: str | None = None,
+    surrogate_key: str | None = None,
+) -> CsvLoadPlan:
+    missing_columns = [
+        column.source_name for column in target_columns if column.source_name not in header
+    ]
+    if missing_columns:
+        raise ValueError(
+            f"Source file {source.path} is missing columns required for clean.{target_table}: "
+            f"{missing_columns}"
+        )
+
+    return CsvLoadPlan(
+        source=source,
+        encoding=encoding,
+        source_header=header,
+        target_table=target_table,
+        target_columns=target_columns,
+        dedupe_key=dedupe_key,
+        surrogate_key=surrogate_key,
+    )
 
 
 def _validate_header(file_path, header: tuple[str, ...]) -> None:
