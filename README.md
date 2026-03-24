@@ -1,153 +1,338 @@
 # Retail Analytics Hackathon Monorepo
 
-This repository is the initial scaffold for a retail analytics application that will later combine churn prediction, recommendations, retail analytics, dashboards, and an MVP web app. It is intentionally limited to runnable infrastructure, service boundaries, developer workflows, SQL placeholders, and stubbed entrypoints.
+Это монорепо для хакатонного проекта по retail analytics. Здесь разделены:
+- продуктовый backend,
+- отдельный ML API,
+- frontend,
+- batch/jobs,
+- SQL-слой для `clean / mart / feature / serving`,
+- локальная инфраструктура через Docker Compose.
 
-## Already Scaffolded
+В проекте намеренно не используется отдельный task runner. Все основные сценарии ниже описаны прямыми командами `docker compose`, чтобы workflow был одинаково понятен на Windows, macOS и Linux.
 
-- `apps/backend`: FastAPI app-facing API with stub routes
-- `apps/ml_api`: separate FastAPI ML interface with stub prediction contracts
-- `apps/frontend`: Next.js placeholder UI shell
-- `jobs/*`: ETL, mart refresh, feature refresh, training, and batch scoring CLIs
-- `sql/*`: placeholders for clean, mart, feature, and serving logic
-- `infra/postgres/init`: bootstrap-only PostgreSQL init scripts
-- `apps/backend/alembic`: single source of truth for schema creation and foundational DDL
-- `infra/superset`: local Superset image/config scaffold
-- `libs/common`: shared config, logging, DB, metrics, and utility helpers
-- `tests`: lightweight boot and health endpoint tests
+## Что уже сделано
 
-## Intentionally Stubbed
+- `apps/backend`: FastAPI backend со stub-роутами
+- `apps/ml_api`: отдельный FastAPI сервис под inference contracts
+- `apps/frontend`: Next.js placeholder frontend
+- `jobs/etl`: рабочий ETL для загрузки `data/raw/*.csv` в `clean.*`
+- `jobs/marts_builder`, `jobs/feature_builder`, `jobs/train`, `jobs/batch_scoring`: scaffold CLI для следующих этапов пайплайна
+- `sql/clean`: явный DDL контракт `clean.*`
+- `sql/mart`, `sql/feature`, `sql/serving`: заготовки под витрины, признаки и serving-слой
+- `apps/backend/alembic`: foundational DDL через Alembic
+- `infra/superset`: Superset с отдельной metadata DB и read-only подключением к аналитической БД
 
-- No cleaning, deduplication, or business transformations yet
-- No real marts, features, or serving SQL
-- No trained models or inference logic
-- No auth system
-- No dashboard definitions
-- No fake analytical outputs
-- No raw CSV replica tables inside PostgreSQL
+## Что пока остается заглушкой
 
-## Data Assumptions
+- настоящая бизнес-очистка `events.csv`
+- mart / feature / serving SQL
+- реальный SQL runner для `marts_builder` и `feature_builder`
+- обучение моделей
+- batch scoring с реальными моделями
+- auth
+- реальные dashboard definitions
 
-- `data/raw/data.csv` is expected to be a wide denormalized transactional dataset
-- `data/raw/events.csv` is expected to be a behavioral event log
-- `events.csv` can contain missing `user_id` values
-- encoding cleanup may be required during ETL
-- customer identity resolution is a later implementation task
-- the intended warehouse lifecycle is `clean -> mart -> feature -> serving`
+## Предпосылки по данным
 
-Raw CSVs stay on the filesystem and are parsed by ETL jobs. The current ETL implementation loads directly into typed clean tables:
+- `data/raw/data.csv` — широкий денормализованный transactional dataset
+- `data/raw/events.csv` — behavioral event log
+- в `events.csv` может отсутствовать `user_id`
+- проблемы с encoding возможны и ожидаемы
+- raw CSV остаются на диске и не копируются в PostgreSQL как raw replica layer
+- целевой жизненный цикл данных: `clean -> mart -> feature -> serving`
 
-- `data.csv` -> `clean.users`, `clean.orders`, `clean.order_items`
+## Что сейчас делает ETL
+
+Текущий ETL берет `data/raw/data.csv` и `data/raw/events.csv` и загружает их в typed clean tables:
+
+- `data.csv` -> `clean.users`
+- `data.csv` -> `clean.orders`
+- `data.csv` -> `clean.order_items`
 - `events.csv` -> `clean.events`
 
-The scaffold does not persist a separate source-file registry in PostgreSQL. Raw files remain the only source of truth.
+Для `data.csv` уже встроена логика из `notebooks/Анализ_data_csv.ipynb`:
+- удаление exact duplicate rows
+- исключение дублирующих колонок
+- исключение `user_geom`
+- исключение `distribution_center_geom`
+- исключение `sold_at`
+- разбиение на сущности `users / orders / order_items`
+- типизация дат, чисел, координат и булевых значений
 
-What is already handled:
-- notebook-backed `data.csv` cleaning:
-  drop exact duplicate rows, drop duplicate columns, drop `user_geom`, `distribution_center_geom`, and `sold_at`
-- structural split by entity
-- typed columns for IDs, timestamps, numerics, booleans, UUIDs, and coordinates
-- safe deduplication for `users`, `orders`, and `order_items` after the notebook cleaning step
-- explicit `clean.*` DDL files in `sql/clean/`
+Контракт `clean.*` хранится явно в:
+- `sql/clean/clean_users.sql`
+- `sql/clean/clean_orders.sql`
+- `sql/clean/clean_order_items.sql`
+- `sql/clean/clean_events.sql`
 
-What is still intentionally deferred:
-- business cleaning rules
-- null-handling policies beyond empty-string to `NULL`
-- customer identity resolution
-- event deduplication or reconciliation
+## Структура репозитория
 
-## Top-Level Ownership
+- `apps/`: frontend и API-сервисы
+- `jobs/`: batch и offline jobs
+- `sql/`: SQL-логика по слоям
+- `infra/`: bootstrap и локальная инфраструктура
+- `libs/`: shared Python utilities
+- `data/`: локальные входные файлы
+- `artifacts/`: model artifacts и будущие outputs
+- `docs/`: архитектурные заметки
+- `tests/`: легкие smoke tests
 
-- `apps/`: application services
-- `jobs/`: batch and offline workflows
-- `sql/`: analytical SQL owned outside Alembic
-- `infra/`: local infrastructure bootstrap
-- `libs/`: shared code
-- `docs/`: architecture and decision notes
-- `data/`: mounted local input files
-- `artifacts/`: model artifacts and future exports
+## Подготовка окружения
 
-## Startup Sequence
+Создай `.env` из `.env.example`.
 
-1. Bootstrap core infra and foundational DDL:
+Вариант для bash:
 
-   ```bash
-   make bootstrap
-   ```
+```bash
+cp .env.example .env
+```
 
-   This will:
+Вариант для PowerShell:
 
-   - copy `.env.example` to `.env` if needed
-   - start `postgres` and `redis`
-   - run `alembic upgrade head` inside the backend container
+```powershell
+Copy-Item .env.example .env
+```
 
-2. Start the long-running local stack:
+Если удобнее, файл можно просто создать вручную на основе `.env.example`.
 
-   ```bash
-   make up
-   ```
+## Быстрый старт
 
-3. Open local services:
+### 1. Поднять Postgres и Redis
+
+```bash
+docker compose --env-file .env up -d postgres redis
+```
+
+### 2. Применить миграции Alembic
+
+```bash
+docker compose --env-file .env run --rm --no-deps backend alembic upgrade head
+```
+
+### 3. Поднять основной локальный стек
+
+```bash
+docker compose --env-file .env up --build -d postgres redis backend ml-api frontend superset
+```
+
+### 4. Открыть сервисы
 
 - Frontend: [http://localhost:13000](http://localhost:13000)
 - Backend docs: [http://localhost:18000/docs](http://localhost:18000/docs)
 - ML API docs: [http://localhost:18001/docs](http://localhost:18001/docs)
 - Superset: [http://localhost:18088](http://localhost:18088)
 
-## Migration Flow
+## Основные сценарии
 
-- `make migrate`: apply foundational Alembic migrations
-- `make current`: print the current Alembic revision
-- `make reset-db`: drop local volumes, restart `postgres` and `redis`, then rerun migrations
+### Bootstrap новой локальной базы
 
-Alembic owns:
+```bash
+docker compose --env-file .env up -d postgres redis
+docker compose --env-file .env run --rm --no-deps backend alembic upgrade head
+```
 
-- schema creation
-- technical tables
-- foundational DDL
-- indexes
-- foundational grants tied to those schemas
+### Полный запуск основного стека
 
-Alembic does not own marts, features, or serving SQL transformations. Those stay in `sql/`.
+```bash
+docker compose --env-file .env up --build -d postgres redis backend ml-api frontend superset
+```
 
-## Developer Workflow
+### Остановить стек
 
-- `make backend-shell`: open a shell in the backend container
-- `make ml-shell`: open a shell in the ml-api container
-- `make db-shell`: open a shell in the postgres container
-- `make psql`: open `psql` inside the postgres container
-- `make etl`: run the ETL scaffold CLI
-- `make marts`: run the mart refresh scaffold CLI
-- `make features`: run the feature refresh scaffold CLI
-- `make train`: run the training scaffold CLI
-- `make score`: run the batch scoring scaffold CLI
-- `make pipeline`: run ETL, marts, features, train, and batch scoring in sequence
-- `make test`: run lightweight tests
-- `make lint`: run Ruff checks
-- `make format`: run Ruff formatting
+```bash
+docker compose --env-file .env down
+```
 
-## Service Responsibilities
+### Посмотреть логи
 
-- Backend: product-facing APIs and future orchestration over curated/serving data
-- ML API: inference contracts and future model-serving behavior
-- Jobs: filesystem ingestion, SQL refreshes, model training, and batch scoring
-- Current ETL demo: load `data/raw/*.csv` directly into typed `clean.*` tables
-- Superset: separate metadata DB plus a dedicated read-only analytics connection into `mart` and `serving`
-- Frontend: placeholder MVP surface for dashboard, customer, churn, recommendations, and forecast views
+```bash
+docker compose --env-file .env logs -f --tail=200
+```
 
-For the scaffold, Superset metadata lives in a separate PostgreSQL database, while dashboard datasets should be registered against the BI read-only DSN and limited to `mart` and `serving`.
+### Узнать текущую ревизию Alembic
 
-## Parallel Team Split
+```bash
+docker compose --env-file .env run --rm --no-deps backend alembic current
+```
 
-- Backend engineers: `apps/backend/`
-- ML engineers: `apps/ml_api/`, `jobs/train/`, `jobs/batch_scoring/`
-- Data engineers: `jobs/etl/`, `jobs/marts_builder/`, `jobs/feature_builder/`, `sql/`
-- BI engineers: `infra/superset/`, future Superset assets, and mart/serving consumption
-- Frontend engineers: `apps/frontend/`
+### Загрузить clean-слой из CSV
 
-## Working Rules
+```bash
+docker compose --env-file .env run --rm etl
+```
 
-- Prefer explicit modules and TODOs over abstraction
-- Keep raw CSVs on disk
-- Keep Alembic disciplined and limited to foundational DDL
-- Keep analytical SQL in `sql/`
-- Use `mart` and `serving` as the default read surfaces for BI and application consumers
+Это реально рабочий шаг. После него в БД появятся:
+- `clean.users`
+- `clean.orders`
+- `clean.order_items`
+- `clean.events`
+
+### Запустить scaffold mart job
+
+```bash
+docker compose --env-file .env run --rm marts-builder
+```
+
+Важно: сейчас `marts-builder` пока только scaffold CLI. Он еще не исполняет SQL автоматически, но это и есть следующий ожидаемый шаг для data engineer.
+
+### Запустить scaffold feature job
+
+```bash
+docker compose --env-file .env run --rm feature-builder
+```
+
+### Запустить scaffold training job
+
+```bash
+docker compose --env-file .env run --rm train
+```
+
+### Запустить scaffold batch scoring job
+
+```bash
+docker compose --env-file .env run --rm batch-scoring
+```
+
+### Прогнать пайплайн по шагам
+
+```bash
+docker compose --env-file .env run --rm etl
+docker compose --env-file .env run --rm marts-builder
+docker compose --env-file .env run --rm feature-builder
+docker compose --env-file .env run --rm train
+docker compose --env-file .env run --rm batch-scoring
+```
+
+## Работа с контейнерами и БД
+
+### Shell в backend
+
+```bash
+docker compose --env-file .env run --rm backend bash
+```
+
+### Shell в ml-api
+
+```bash
+docker compose --env-file .env run --rm ml-api bash
+```
+
+### Shell внутри Postgres-контейнера
+
+```bash
+docker compose --env-file .env exec postgres sh
+```
+
+### Открыть `psql`
+
+```bash
+docker compose --env-file .env exec postgres sh -lc 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
+```
+
+Если quoting в твоем shell неудобен, можно зайти через `sh`, а потом уже запустить:
+
+```bash
+psql -U retail -d retail_analytics
+```
+
+## Полный reset локальной БД
+
+Эта команда удаляет локальные volumes PostgreSQL и Redis.
+
+```bash
+docker compose --env-file .env down -v
+docker compose --env-file .env up -d postgres redis
+docker compose --env-file .env run --rm --no-deps backend alembic upgrade head
+```
+
+После этого `clean.*`, `mart.*`, `feature.*` и `serving.*` нужно собирать заново.
+
+## Проверки
+
+### Легкие health tests
+
+```bash
+pytest -q -s tests/test_backend_health.py tests/test_ml_api_health.py
+```
+
+### Ruff
+
+```bash
+ruff check .
+```
+
+### Форматирование
+
+```bash
+ruff format .
+```
+
+## Кто что меняет в проекте
+
+### Backend engineer
+
+Работает в:
+- `apps/backend/`
+
+Не лезет в:
+- ETL ingestion
+- SQL витрины
+- training logic
+
+### ML engineer
+
+Работает в:
+- `apps/ml_api/`
+- `jobs/train/`
+- `jobs/batch_scoring/`
+- `sql/feature/`
+- `sql/serving/`
+
+### Data engineer
+
+Работает в:
+- `jobs/etl/`
+- `jobs/marts_builder/`
+- `jobs/feature_builder/`
+- `sql/clean/`
+- `sql/mart/`
+- `sql/feature/`
+
+### BI engineer
+
+Работает в:
+- `infra/superset/`
+- `sql/mart/`
+- `sql/serving/`
+
+### Frontend engineer
+
+Работает в:
+- `apps/frontend/`
+
+## Как будет работать разработчик витрин
+
+После того как `clean.*` уже собран через ETL, следующий человек работает так:
+
+1. Открывает SQL-файлы в `sql/mart/`
+2. Реализует витрины, например:
+   - `sql/mart/mart_sales_daily.sql`
+   - `sql/mart/mart_customer_360.sql`
+3. Прогоняет mart job или выполняет SQL вручную в Postgres
+4. Проверяет результат через `psql` или Superset
+
+То есть разработчик витрин не должен трогать:
+- Alembic
+- raw CSV ingestion
+- backend API
+
+Его зона ответственности — `mart.*` как reusable analytical layer поверх `clean.*`
+
+## Конвенции
+
+- Alembic используется только для foundational DDL
+- аналитическая логика живет в `sql/`
+- raw CSV остаются на диске
+- backend и BI в норме читают `mart` и `serving`
+- `clean.*` должен быть явным, обозримым и воспроизводимым
+- prefer boring, explicit, maintainable structure over clever abstractions

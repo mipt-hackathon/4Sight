@@ -6,5 +6,5 @@ Use this folder for SQL that defines and shapes ETL outputs into the `clean` sch
 - Current source of truth for `clean.*` table DDL lives in these SQL files.
 - The data.csv contract follows `notebooks/Анализ_data_csv.ipynb`:
   exact duplicate rows are dropped first, duplicate columns are removed, and only approved columns remain.
-- SQL here should make table contracts obvious and reviewable before mart/feature work starts.
+- SQL here should keep table contracts obvious and reviewable before mart/feature work starts.
 - Do not treat filesystem CSVs as raw PostgreSQL replica tables.
