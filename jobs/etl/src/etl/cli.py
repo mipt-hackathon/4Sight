@@ -30,7 +30,7 @@ def main() -> None:
 
     logger.info("Running ETL scaffold for service=%s", settings.app_name)
     logger.info("Starting ETL scaffold for source_dir=%s", args.source_dir)
-    logger.info("Current scope: load raw CSVs directly into typed clean tables.")
+    logger.info("Current scope: apply notebook-backed cleaning and load typed clean tables.")
     logger.info(
         "Target tables: clean.users, clean.orders, clean.order_items, and clean.events."
     )

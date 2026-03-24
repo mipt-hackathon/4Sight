@@ -24,5 +24,7 @@ class CsvLoadPlan:
     source_header: tuple[str, ...]
     target_table: str
     target_columns: tuple[TableColumnSpec, ...]
+    ddl_sql_path: Path
     dedupe_key: str | None = None
     surrogate_key: str | None = None
+    drop_source_duplicates: bool = False

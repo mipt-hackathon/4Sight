@@ -42,9 +42,12 @@ Raw CSVs stay on the filesystem and are parsed by ETL jobs. The current ETL impl
 The scaffold does not persist a separate source-file registry in PostgreSQL. Raw files remain the only source of truth.
 
 What is already handled:
+- notebook-backed `data.csv` cleaning:
+  drop exact duplicate rows, drop duplicate columns, drop `user_geom`, `distribution_center_geom`, and `sold_at`
 - structural split by entity
 - typed columns for IDs, timestamps, numerics, booleans, UUIDs, and coordinates
-- safe deduplication for `users`, `orders`, and `order_items` where the raw file repeats identical entity rows
+- safe deduplication for `users`, `orders`, and `order_items` after the notebook cleaning step
+- explicit `clean.*` DDL files in `sql/clean/`
 
 What is still intentionally deferred:
 - business cleaning rules

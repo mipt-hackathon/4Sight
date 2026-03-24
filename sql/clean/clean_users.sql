@@ -1,18 +1,28 @@
 /*
 Purpose:
-  Build cleaned customer/user records for the clean schema.
+  Define clean.users after applying the notebook-backed data.csv cleaning contract.
 
-Expected inputs:
-  - Parsed user and order-level attributes produced by the ETL job from mounted CSV files.
-  - File-level metadata for deduplication and quality checks.
-
-Expected outputs:
-  - clean.users or equivalent curated customer table.
-
-TODO:
-  - Standardize identifiers and data types.
-  - Resolve duplicates.
-  - Normalize nulls and malformed values.
+Cleaning contract inherited from notebooks/Анализ_data_csv.ipynb:
+  - drop exact duplicate rows from data.csv before splitting by entity
+  - keep user_id and drop duplicate id column
+  - drop user_geom because its coordinates duplicate delivery_longitude / delivery_latitude
+  - keep only analyst-approved user attributes
 */
 
--- TODO: implement clean user transformation logic.
+CREATE TABLE clean.users (
+    etl_source_file TEXT NOT NULL DEFAULT 'data.csv',
+    etl_loaded_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    user_id BIGINT PRIMARY KEY,
+    gender TEXT,
+    first_name TEXT,
+    last_name TEXT,
+    email TEXT,
+    age INTEGER,
+    state TEXT,
+    street_address TEXT,
+    postal_code TEXT,
+    city TEXT,
+    country TEXT,
+    traffic_source TEXT,
+    is_loyal BOOLEAN
+);

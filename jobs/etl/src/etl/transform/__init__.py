@@ -1,9 +1,12 @@
 import logging
+from pathlib import Path
 
 from etl.models import CsvLoadPlan, CsvSourceFile, TableColumnSpec
 from etl.parsers import detect_file_encoding, read_csv_header
 
 logger = logging.getLogger(__name__)
+REPO_ROOT = Path(__file__).resolve().parents[5]
+CLEAN_SQL_DIR = REPO_ROOT / "sql" / "clean"
 
 DATA_FILE_PLANS: tuple[tuple[str, tuple[TableColumnSpec, ...], str], ...] = (
     (
@@ -21,7 +24,6 @@ DATA_FILE_PLANS: tuple[tuple[str, tuple[TableColumnSpec, ...], str], ...] = (
             TableColumnSpec("city", "city", "text"),
             TableColumnSpec("country", "country", "text"),
             TableColumnSpec("traffic_source", "traffic_source", "text"),
-            TableColumnSpec("user_geom", "user_geom", "text"),
             TableColumnSpec("is_loyal", "is_loyal", "boolean"),
         ),
         "user_id",
@@ -58,7 +60,6 @@ DATA_FILE_PLANS: tuple[tuple[str, tuple[TableColumnSpec, ...], str], ...] = (
             TableColumnSpec("cost", "cost", "numeric", nullable=False),
             TableColumnSpec("category", "category", "text"),
             TableColumnSpec("brand", "brand", "text"),
-            TableColumnSpec("retail_price", "retail_price", "numeric", nullable=False),
             TableColumnSpec("department", "department", "text"),
             TableColumnSpec("sku", "sku", "text"),
             TableColumnSpec(
@@ -67,8 +68,6 @@ DATA_FILE_PLANS: tuple[tuple[str, tuple[TableColumnSpec, ...], str], ...] = (
                 "bigint",
                 nullable=False,
             ),
-            TableColumnSpec("sold_at", "sold_at", "timestamptz"),
-            TableColumnSpec("distribution_center_geom", "distribution_center_geom", "text"),
             TableColumnSpec("delivery_longitude", "delivery_longitude", "float8"),
             TableColumnSpec("delivery_latitude", "delivery_latitude", "float8"),
             TableColumnSpec("warehouse_name", "warehouse_name", "text"),
@@ -103,9 +102,12 @@ def run_transform(extracted_artifacts: list[CsvSourceFile]) -> list[CsvLoadPlan]
     Build direct-to-clean typed load plans from the raw CSV files.
 
     Current scope:
+      - apply notebook-backed cleaning rules to data.csv
+      - drop exact duplicate rows from data.csv before splitting
+      - keep only the analyst-approved data.csv columns
       - split data.csv into users/orders/order_items
       - load events.csv into clean.events
-      - keep business cleaning, reconciliation, and enrichment for later work
+      - keep events-specific cleaning, reconciliation, and enrichment for later work
     """
 
     plans: list[CsvLoadPlan] = []
@@ -140,7 +142,9 @@ def _build_file_plans(
                 header=header,
                 target_table=table_name,
                 target_columns=target_columns,
+                ddl_sql_path=_clean_sql_path(table_name),
                 dedupe_key=dedupe_key,
+                drop_source_duplicates=True,
             )
             for table_name, target_columns, dedupe_key in DATA_FILE_PLANS
         ]
@@ -153,6 +157,7 @@ def _build_file_plans(
                 header=header,
                 target_table="events",
                 target_columns=EVENTS_PLAN,
+                ddl_sql_path=_clean_sql_path("events"),
                 surrogate_key="event_row_id",
             )
         ]
@@ -168,8 +173,10 @@ def _build_plan(
     header: tuple[str, ...],
     target_table: str,
     target_columns: tuple[TableColumnSpec, ...],
+    ddl_sql_path: Path,
     dedupe_key: str | None = None,
     surrogate_key: str | None = None,
+    drop_source_duplicates: bool = False,
 ) -> CsvLoadPlan:
     missing_columns = [
         column.source_name for column in target_columns if column.source_name not in header
@@ -180,15 +187,26 @@ def _build_plan(
             f"{missing_columns}"
         )
 
+    if not ddl_sql_path.exists():
+        raise FileNotFoundError(
+            f"Missing SQL DDL definition for clean.{target_table}: {ddl_sql_path}"
+        )
+
     return CsvLoadPlan(
         source=source,
         encoding=encoding,
         source_header=header,
         target_table=target_table,
         target_columns=target_columns,
+        ddl_sql_path=ddl_sql_path,
         dedupe_key=dedupe_key,
         surrogate_key=surrogate_key,
+        drop_source_duplicates=drop_source_duplicates,
     )
+
+
+def _clean_sql_path(target_table: str) -> Path:
+    return CLEAN_SQL_DIR / f"clean_{target_table}.sql"
 
 
 def _validate_header(file_path, header: tuple[str, ...]) -> None:
