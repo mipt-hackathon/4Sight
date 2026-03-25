@@ -34,9 +34,7 @@ def main() -> None:
         "Current scope: apply notebook-backed cleaning for data.csv and events.csv, then load "
         "typed clean tables."
     )
-    logger.info(
-        "Target tables: clean.users, clean.orders, clean.order_items, and clean.events."
-    )
+    logger.info("Target tables: clean.users, clean.orders, clean.order_items, and clean.events.")
     source_files = inspect_source_files(args.source_dir)
     logger.info("Discovered source CSV files: %s", source_files or "none yet")
     validate_inputs(args.source_dir)

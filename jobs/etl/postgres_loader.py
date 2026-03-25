@@ -34,7 +34,6 @@ def run_load(transformed_artifacts: list[CsvLoadPlan]) -> None:
         _recreate_target_tables(connection, transformed_artifacts)
 
     for plan in transformed_artifacts:
-
         rows_loaded, source_duplicates_skipped, entity_duplicates_skipped = _copy_rows(engine, plan)
 
         logger.info(

@@ -7,7 +7,8 @@ import { AppShell } from "../components/app-shell";
 
 export const metadata: Metadata = {
   title: "Retail Analytics Hackathon",
-  description: "Frontend scaffold for dashboard, churn, recommendations, and forecast flows.",
+  description:
+    "Frontend scaffold for dashboard, churn, recommendations, and forecast flows.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ReactNode } from "react";
 
-
 const navigation = [
   { href: "/", label: "Home" },
   { href: "/dashboard", label: "Dashboard" },
@@ -10,7 +9,6 @@ const navigation = [
   { href: "/recommendations", label: "Recommendations" },
   { href: "/forecast", label: "Forecast" },
 ];
-
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (

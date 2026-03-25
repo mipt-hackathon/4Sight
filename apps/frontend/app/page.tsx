@@ -5,8 +5,8 @@ export default function HomePage() {
     <div className="page-card">
       <h1>Retail Analytics Scaffold</h1>
       <p className="muted">
-        This frontend is intentionally minimal. Use the route shells below to build the MVP in
-        parallel with backend, ML, and data work.
+        This frontend is intentionally minimal. Use the route shells below to
+        build the MVP in parallel with backend, ML, and data work.
       </p>
       <ul>
         <li>
