@@ -102,6 +102,39 @@ Copy-Item .env.example .env
 
 Если удобнее, файл можно просто создать вручную на основе `.env.example`.
 
+## Настройка pre-commit
+
+В репозитории уже есть конфиг [`.pre-commit-config.yaml`](/mnt/c/DEV/MIPT/2%20sem/hackathon/repo/.pre-commit-config.yaml) с базовыми проверками:
+- `ruff` и `ruff-format` для Python-кода
+- базовые git/yaml hooks
+- `prettier` для файлов во frontend
+
+Универсальный способ поставить `pre-commit` и dev-зависимости:
+
+```bash
+python -m pip install -r requirements/dev.txt
+```
+
+Установить git hooks локально для репозитория:
+
+```bash
+python -m pre_commit install
+```
+
+Если хочешь сразу скачать окружения для hook'ов и проверить, что все работает:
+
+```bash
+python -m pre_commit install --install-hooks
+python -m pre_commit run --all-files
+```
+
+Что это дает:
+- перед каждым `git commit` будут запускаться проверки из `.pre-commit-config.yaml`
+- часть проблем будет исправляться автоматически, например formatting через `ruff` и `prettier`
+- тот же набор проверок можно вручную гонять в любой момент через `python -m pre_commit run --all-files`
+
+Для `prettier` используется локальный `pre-commit` hook с отдельным Node-окружением, поэтому первый запуск может занять чуть больше времени, пока `pre-commit` подготовит это окружение.
+
 ## Быстрый старт
 
 ### 1. Поднять Postgres и Redis
