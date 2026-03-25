@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from etl.parsers import discover_source_files
+from etl.csv_parsers import discover_source_files
 
 
 def validate_inputs(source_dir: str) -> None:
@@ -13,6 +13,3 @@ def validate_inputs(source_dir: str) -> None:
         raise FileNotFoundError(
             f"No CSV files were found under {path}. Expected files such as data.csv and events.csv."
         )
-
-
-__all__ = ["validate_inputs"]

@@ -1,7 +1,7 @@
 import logging
 
-from common.config import get_settings
-from common.logging import configure_logging
+from common.config.settings import get_settings
+from common.logging.setup import configure_logging
 
 logger = logging.getLogger(__name__)
 

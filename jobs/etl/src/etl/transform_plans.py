@@ -1,8 +1,8 @@
 import logging
 
 from etl.contracts import build_load_plans
+from etl.csv_parsers import detect_file_encoding, read_csv_header
 from etl.models import CsvLoadPlan, CsvSourceFile
-from etl.parsers import detect_file_encoding, read_csv_header
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +52,3 @@ def _validate_header(file_path, header: tuple[str, ...]) -> None:
                 f"CSV header contains duplicate column name {column_name!r} in {file_path}"
             )
         seen.add(column_name)
-
-
-__all__ = ["run_transform"]

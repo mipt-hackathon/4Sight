@@ -1,14 +1,14 @@
 import argparse
 import logging
 
-from common.config import get_settings
-from common.logging import configure_logging
+from common.config.settings import get_settings
+from common.logging.setup import configure_logging
 
-from etl.extract import run_extract
-from etl.load import run_load
-from etl.parsers import inspect_source_files
-from etl.transform import run_transform
-from etl.validators import validate_inputs
+from etl.csv_parsers import inspect_source_files
+from etl.input_validation import validate_inputs
+from etl.postgres_loader import run_load
+from etl.source_extract import run_extract
+from etl.transform_plans import run_transform
 
 logger = logging.getLogger(__name__)
 

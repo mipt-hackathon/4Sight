@@ -1,7 +1,6 @@
+from common.config.settings import get_settings
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
-
-from common.config.settings import get_settings
 
 
 def create_db_engine() -> Engine:

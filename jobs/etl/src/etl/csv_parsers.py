@@ -44,9 +44,3 @@ def read_csv_header(file_path: Path, encoding: str) -> tuple[str, ...]:
         raise ValueError(f"CSV file is empty or missing a header row: {file_path}")
 
     return tuple(header)
-__all__ = [
-    "detect_file_encoding",
-    "discover_source_files",
-    "inspect_source_files",
-    "read_csv_header",
-]

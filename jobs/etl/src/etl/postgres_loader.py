@@ -6,7 +6,7 @@ from collections import defaultdict
 from datetime import datetime
 from decimal import Decimal
 
-from common.db import create_db_engine
+from common.db.postgres import create_db_engine
 from psycopg import sql
 from sqlalchemy import text
 from sqlalchemy.engine import Connection
@@ -226,12 +226,10 @@ def _count_rows(engine, table_name: str) -> int:
         ).scalar_one()
     return int(row_count)
 
+
 def _source_row_signature(row: dict[str, str | None], source_header: tuple[str, ...]) -> bytes:
     digest = hashlib.sha1()
     for column_name in source_header:
         digest.update((row.get(column_name) or "").encode("utf-8"))
         digest.update(b"\x1f")
     return digest.digest()
-
-
-__all__ = ["run_load"]

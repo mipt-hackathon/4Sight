@@ -1,1 +1,0 @@
-"""Batch scoring job package."""

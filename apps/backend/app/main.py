@@ -1,4 +1,4 @@
-from common.logging import configure_logging
+from common.logging.setup import configure_logging
 from fastapi import FastAPI
 
 from app.api.router import api_router
