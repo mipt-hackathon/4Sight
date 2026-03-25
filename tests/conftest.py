@@ -8,11 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 for relative_path in [
     "libs/common/src",
-    "jobs/etl/src",
-    "jobs/marts_builder/src",
-    "jobs/feature_builder/src",
-    "jobs/train/src",
-    "jobs/batch_scoring/src",
+    "jobs",
 ]:
     resolved = str(ROOT / relative_path)
     if resolved not in sys.path:

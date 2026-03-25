@@ -2,7 +2,7 @@ from pathlib import Path
 
 from etl.models import CsvLoadPlan, CsvSourceFile, FillMissingFromKeyRule, TableColumnSpec
 
-REPO_ROOT = Path(__file__).resolve().parents[4]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 CLEAN_SQL_DIR = REPO_ROOT / "sql" / "clean"
 
 DATA_FILE_PLANS: tuple[tuple[str, tuple[TableColumnSpec, ...], str], ...] = (

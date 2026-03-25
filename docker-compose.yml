@@ -149,7 +149,7 @@ services:
       APP_LOG_LEVEL: ${APP_LOG_LEVEL}
       POSTGRES_DSN: ${POSTGRES_DSN}
       REDIS_URL: ${REDIS_URL}
-      PYTHONPATH: /workspace/libs/common/src:/workspace/jobs/etl/src
+      PYTHONPATH: /workspace/libs/common/src:/workspace/jobs
     volumes:
       - ./jobs/etl:/workspace/jobs/etl
       - ./libs/common:/workspace/libs/common
@@ -175,7 +175,7 @@ services:
       APP_ENV: ${APP_ENV}
       APP_LOG_LEVEL: ${APP_LOG_LEVEL}
       POSTGRES_DSN: ${POSTGRES_DSN}
-      PYTHONPATH: /workspace/libs/common/src:/workspace/jobs/marts_builder/src
+      PYTHONPATH: /workspace/libs/common/src:/workspace/jobs
     volumes:
       - ./jobs/marts_builder:/workspace/jobs/marts_builder
       - ./libs/common:/workspace/libs/common
@@ -198,7 +198,7 @@ services:
       APP_ENV: ${APP_ENV}
       APP_LOG_LEVEL: ${APP_LOG_LEVEL}
       POSTGRES_DSN: ${POSTGRES_DSN}
-      PYTHONPATH: /workspace/libs/common/src:/workspace/jobs/feature_builder/src
+      PYTHONPATH: /workspace/libs/common/src:/workspace/jobs
     volumes:
       - ./jobs/feature_builder:/workspace/jobs/feature_builder
       - ./libs/common:/workspace/libs/common
@@ -221,7 +221,7 @@ services:
       APP_ENV: ${APP_ENV}
       APP_LOG_LEVEL: ${APP_LOG_LEVEL}
       POSTGRES_DSN: ${POSTGRES_DSN}
-      PYTHONPATH: /workspace/libs/common/src:/workspace/jobs/train/src
+      PYTHONPATH: /workspace/libs/common/src:/workspace/jobs
     volumes:
       - ./jobs/train:/workspace/jobs/train
       - ./libs/common:/workspace/libs/common
@@ -245,7 +245,7 @@ services:
       APP_ENV: ${APP_ENV}
       APP_LOG_LEVEL: ${APP_LOG_LEVEL}
       POSTGRES_DSN: ${POSTGRES_DSN}
-      PYTHONPATH: /workspace/libs/common/src:/workspace/jobs/batch_scoring/src
+      PYTHONPATH: /workspace/libs/common/src:/workspace/jobs
     volumes:
       - ./jobs/batch_scoring:/workspace/jobs/batch_scoring
       - ./libs/common:/workspace/libs/common
