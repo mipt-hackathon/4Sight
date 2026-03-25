@@ -24,7 +24,7 @@
 
 ## Что пока остается заглушкой
 
-- настоящая бизнес-очистка `events.csv`
+- более глубокая бизнес-очистка поверх текущих notebook-backed правил для `data.csv` и `events.csv`
 - mart / feature / serving SQL
 - реальный SQL runner для `marts_builder` и `feature_builder`
 - обучение моделей
@@ -58,6 +58,13 @@
 - исключение `sold_at`
 - разбиение на сущности `users / orders / order_items`
 - типизация дат, чисел, координат и булевых значений
+
+Для `events.csv` уже встроена логика из `notebooks/Анализ_data_csv.ipynb`:
+- удаление exact duplicate rows
+- сохранение всех event-колонок
+- заполнение пропусков в `user_id` по `ip_address`, если в других deduplicated events этот `ip_address` уже связан с пользователем
+- заполнение пропусков в `city` по `ip_address`, если в других deduplicated events этот `ip_address` уже связан с городом
+- типизация `created_at` и `session_id`
 
 Контракт `clean.*` хранится явно в:
 - `sql/clean/clean_users.sql`

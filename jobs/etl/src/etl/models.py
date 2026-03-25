@@ -18,6 +18,12 @@ class TableColumnSpec:
 
 
 @dataclass(frozen=True)
+class FillMissingFromKeyRule:
+    fill_column_name: str
+    lookup_key_column: str
+
+
+@dataclass(frozen=True)
 class CsvLoadPlan:
     source: CsvSourceFile
     encoding: str
@@ -28,3 +34,4 @@ class CsvLoadPlan:
     dedupe_key: str | None = None
     surrogate_key: str | None = None
     drop_source_duplicates: bool = False
+    fill_missing_from_key_rules: tuple[FillMissingFromKeyRule, ...] = ()

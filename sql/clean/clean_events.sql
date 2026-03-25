@@ -3,12 +3,14 @@ Purpose:
   Define clean.events for direct ETL loading from events.csv.
 
 Current scope:
-  - preserve one row per incoming event record
-  - keep missing user_id values
+  - drop exact duplicate rows from events.csv
+  - keep all analyst-approved event columns
+  - fill missing user_id from ip_address when another deduplicated event provides it
+  - fill missing city from ip_address when another deduplicated event provides it
   - type timestamps and session_id during ETL loading
 
 TODO:
-  - implement event-specific cleaning, reconciliation, and anomaly handling
+  - implement deeper event reconciliation and anomaly handling after the notebook-backed pass
 */
 
 CREATE TABLE clean.events (

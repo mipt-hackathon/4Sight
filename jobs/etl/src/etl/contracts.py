@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from etl.models import CsvLoadPlan, CsvSourceFile, TableColumnSpec
+from etl.models import CsvLoadPlan, CsvSourceFile, FillMissingFromKeyRule, TableColumnSpec
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 CLEAN_SQL_DIR = REPO_ROOT / "sql" / "clean"
@@ -93,6 +93,11 @@ EVENTS_PLAN: tuple[TableColumnSpec, ...] = (
     TableColumnSpec("event_type", "event_type", "text"),
 )
 
+EVENTS_FILL_MISSING_FROM_IP_RULES: tuple[FillMissingFromKeyRule, ...] = (
+    FillMissingFromKeyRule("user_id", "ip_address"),
+    FillMissingFromKeyRule("city", "ip_address"),
+)
+
 
 def build_load_plans(
     source: CsvSourceFile,
@@ -124,6 +129,8 @@ def build_load_plans(
                 target_columns=EVENTS_PLAN,
                 ddl_sql_path=_clean_sql_path("events"),
                 surrogate_key="event_row_id",
+                drop_source_duplicates=True,
+                fill_missing_from_key_rules=EVENTS_FILL_MISSING_FROM_IP_RULES,
             )
         ]
 
@@ -142,6 +149,7 @@ def _build_plan(
     dedupe_key: str | None = None,
     surrogate_key: str | None = None,
     drop_source_duplicates: bool = False,
+    fill_missing_from_key_rules: tuple[FillMissingFromKeyRule, ...] = (),
 ) -> CsvLoadPlan:
     missing_columns = [
         column.source_name for column in target_columns if column.source_name not in header
@@ -167,6 +175,7 @@ def _build_plan(
         dedupe_key=dedupe_key,
         surrogate_key=surrogate_key,
         drop_source_duplicates=drop_source_duplicates,
+        fill_missing_from_key_rules=fill_missing_from_key_rules,
     )
 
 

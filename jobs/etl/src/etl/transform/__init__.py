@@ -16,8 +16,11 @@ def run_transform(extracted_artifacts: list[CsvSourceFile]) -> list[CsvLoadPlan]
       - drop exact duplicate rows from data.csv before splitting
       - keep only the analyst-approved data.csv columns
       - split data.csv into users/orders/order_items
-      - load events.csv into clean.events
-      - keep events-specific cleaning, reconciliation, and enrichment for later work
+      - apply notebook-backed cleaning rules to events.csv
+      - drop exact duplicate rows from events.csv before loading
+      - fill missing events.user_id from ip_address when notebook logic allows it
+      - fill missing events.city from ip_address when notebook logic allows it
+      - load events.csv into clean.events without dropping event columns
     """
 
     plans: list[CsvLoadPlan] = []

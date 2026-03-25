@@ -2,6 +2,7 @@ import csv
 import hashlib
 import logging
 import uuid
+from collections import defaultdict
 from datetime import datetime
 from decimal import Decimal
 
@@ -10,7 +11,7 @@ from psycopg import sql
 from sqlalchemy import text
 from sqlalchemy.engine import Connection
 
-from etl.models import CsvLoadPlan, TableColumnSpec
+from etl.models import CsvLoadPlan, FillMissingFromKeyRule, TableColumnSpec
 
 logger = logging.getLogger(__name__)
 OBSOLETE_IMPORT_TABLES = (
@@ -49,8 +50,8 @@ def run_load(transformed_artifacts: list[CsvLoadPlan]) -> None:
         )
 
     logger.info(
-        "TODO: extend events cleaning and downstream curated modeling on top of the current "
-        "clean table contract."
+        "TODO: extend business cleaning and downstream curated modeling on top of the current "
+        "notebook-backed clean table contract."
     )
 
 
@@ -78,8 +79,9 @@ def _copy_rows(engine, plan: CsvLoadPlan) -> tuple[int, int, int]:
         sql.SQL(", ").join(sql.Identifier(column_name) for column_name in target_column_names),
     )
 
+    fill_lookup_maps = _build_fill_lookup_maps(plan)
     seen_keys: set[str] = set()
-    seen_source_rows: set[str] = set()
+    seen_source_rows: set[bytes] = set()
     skipped_source_duplicates = 0
     skipped_entity_duplicates = 0
     raw_connection = engine.raw_connection()
@@ -105,6 +107,12 @@ def _copy_rows(engine, plan: CsvLoadPlan) -> tuple[int, int, int]:
                                 continue
                             seen_source_rows.add(row_signature)
 
+                        _apply_fill_missing_from_key_rules(
+                            row,
+                            fill_lookup_maps,
+                            plan.fill_missing_from_key_rules,
+                        )
+
                         if plan.dedupe_key:
                             dedupe_value = row.get(plan.dedupe_key)
                             if dedupe_value in seen_keys:
@@ -126,6 +134,65 @@ def _copy_rows(engine, plan: CsvLoadPlan) -> tuple[int, int, int]:
         skipped_source_duplicates,
         skipped_entity_duplicates,
     )
+
+
+def _build_fill_lookup_maps(
+    plan: CsvLoadPlan,
+) -> dict[tuple[str, str], dict[str, str]]:
+    if not plan.fill_missing_from_key_rules:
+        return {}
+
+    fill_lookup_maps: dict[tuple[str, str], dict[str, str]] = defaultdict(dict)
+    seen_source_rows: set[bytes] = set()
+    with plan.source.path.open("r", encoding=plan.encoding, newline="") as handle:
+        reader = csv.DictReader(handle)
+        if tuple(reader.fieldnames or ()) != plan.source_header:
+            raise ValueError(f"CSV header changed while loading {plan.source.path}")
+
+        for row_number, row in enumerate(reader, start=1):
+            if None in row:
+                raise ValueError(
+                    f"CSV row {row_number} in {plan.source.path} has extra unnamed columns. "
+                    "TODO: handle malformed rows in a later cleaning step."
+                )
+
+            if plan.drop_source_duplicates:
+                row_signature = _source_row_signature(row, plan.source_header)
+                if row_signature in seen_source_rows:
+                    continue
+                seen_source_rows.add(row_signature)
+
+            for rule in plan.fill_missing_from_key_rules:
+                lookup_key = row.get(rule.lookup_key_column)
+                fill_value = row.get(rule.fill_column_name)
+                if lookup_key in (None, "") or fill_value in (None, ""):
+                    continue
+                fill_lookup_maps[(rule.fill_column_name, rule.lookup_key_column)][lookup_key] = (
+                    fill_value
+                )
+
+    return dict(fill_lookup_maps)
+
+
+def _apply_fill_missing_from_key_rules(
+    row: dict[str, str | None],
+    fill_lookup_maps: dict[tuple[str, str], dict[str, str]],
+    rules: tuple[FillMissingFromKeyRule, ...],
+) -> None:
+    for rule in rules:
+        if row.get(rule.fill_column_name) not in (None, ""):
+            continue
+
+        lookup_key = row.get(rule.lookup_key_column)
+        if lookup_key in (None, ""):
+            continue
+
+        fill_value = fill_lookup_maps.get(
+            (rule.fill_column_name, rule.lookup_key_column),
+            {},
+        ).get(lookup_key)
+        if fill_value not in (None, ""):
+            row[rule.fill_column_name] = fill_value
 
 
 def _convert_value(value: str | None, column_spec: TableColumnSpec):
@@ -159,12 +226,12 @@ def _count_rows(engine, table_name: str) -> int:
         ).scalar_one()
     return int(row_count)
 
-def _source_row_signature(row: dict[str, str | None], source_header: tuple[str, ...]) -> str:
+def _source_row_signature(row: dict[str, str | None], source_header: tuple[str, ...]) -> bytes:
     digest = hashlib.sha1()
     for column_name in source_header:
         digest.update((row.get(column_name) or "").encode("utf-8"))
         digest.update(b"\x1f")
-    return digest.hexdigest()
+    return digest.digest()
 
 
 __all__ = ["run_load"]
