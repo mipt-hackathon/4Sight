@@ -11,7 +11,7 @@ Current scope:
   - enforce that any non-null user_id points to an existing clean.users record
 
 TODO:
-  - implement deeper event reconciliation and anomaly handling after the notebook-backed pass
+  - add optional event reconciliation and anomaly handling beyond the current notebook-backed pass
 */
 
 CREATE TABLE clean.events (

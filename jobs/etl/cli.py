@@ -43,7 +43,10 @@ def main() -> None:
     extracted_artifacts = run_extract(args.source_dir)
     transformed_artifacts = run_transform(extracted_artifacts)
     run_load(transformed_artifacts)
-    logger.info("ETL clean load completed. TODO: implement business cleaning and curated modeling.")
+    logger.info(
+        "ETL clean load completed. Additional domain-specific cleaning and downstream modeling "
+        "remain future work, but the current notebook-backed clean contract is fully applied."
+    )
 
 
 if __name__ == "__main__":

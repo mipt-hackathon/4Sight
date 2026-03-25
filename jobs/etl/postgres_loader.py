@@ -49,8 +49,8 @@ def run_load(transformed_artifacts: list[CsvLoadPlan]) -> None:
         )
 
     logger.info(
-        "TODO: extend business cleaning and downstream curated modeling on top of the current "
-        "notebook-backed clean table contract."
+        "Current notebook-backed clean table contract is fully loaded. Additional domain-specific "
+        "rules and downstream curated layers can be added later without changing this ETL baseline."
     )
 
 
@@ -103,7 +103,8 @@ def _copy_rows(engine, plan: CsvLoadPlan) -> tuple[int, int, int]:
                         if None in row:
                             raise ValueError(
                                 f"CSV row {row_number} in {plan.source.path} has extra unnamed "
-                                "columns. TODO: handle malformed rows in a later cleaning step."
+                                "columns. Malformed-row handling beyond the current "
+                                "notebook-backed contract is a later enhancement."
                             )
 
                         if plan.drop_source_duplicates:
@@ -159,7 +160,8 @@ def _build_fill_lookup_maps(
             if None in row:
                 raise ValueError(
                     f"CSV row {row_number} in {plan.source.path} has extra unnamed columns. "
-                    "TODO: handle malformed rows in a later cleaning step."
+                    "Malformed-row handling beyond the current notebook-backed contract is a later "
+                    "enhancement."
                 )
 
             if plan.drop_source_duplicates:

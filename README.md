@@ -24,7 +24,7 @@
 
 ## Что пока остается заглушкой
 
-- более глубокая бизнес-очистка поверх текущих notebook-backed правил для `data.csv` и `events.csv`
+- дополнительные бизнес-правила и обогащение поверх уже реализованного notebook-backed `clean`-слоя
 - mart / feature / serving SQL
 - реальный SQL runner для `marts_builder` и `feature_builder`
 - обучение моделей
