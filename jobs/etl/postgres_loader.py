@@ -31,10 +31,9 @@ def run_load(transformed_artifacts: list[CsvLoadPlan]) -> None:
     with engine.begin() as connection:
         connection.execute(text("CREATE SCHEMA IF NOT EXISTS clean"))
         _drop_obsolete_import_tables(connection)
+        _recreate_target_tables(connection, transformed_artifacts)
 
     for plan in transformed_artifacts:
-        with engine.begin() as connection:
-            _recreate_target_table(connection, plan)
 
         rows_loaded, source_duplicates_skipped, entity_duplicates_skipped = _copy_rows(engine, plan)
 
@@ -67,8 +66,15 @@ def _recreate_target_table(connection: Connection, plan: CsvLoadPlan) -> None:
             f"SQL DDL file is empty for clean.{plan.target_table}: {plan.ddl_sql_path}"
         )
 
-    connection.execute(text(f'DROP TABLE IF EXISTS clean."{plan.target_table}"'))
     connection.exec_driver_sql(ddl_sql)
+
+
+def _recreate_target_tables(connection: Connection, plans: list[CsvLoadPlan]) -> None:
+    for plan in reversed(plans):
+        connection.execute(text(f'DROP TABLE IF EXISTS clean."{plan.target_table}"'))
+
+    for plan in plans:
+        _recreate_target_table(connection, plan)
 
 
 def _copy_rows(engine, plan: CsvLoadPlan) -> tuple[int, int, int]:

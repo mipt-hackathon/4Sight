@@ -8,6 +8,7 @@ Current scope:
   - fill missing user_id from ip_address when another deduplicated event provides it
   - fill missing city from ip_address when another deduplicated event provides it
   - type timestamps and session_id during ETL loading
+  - enforce that any non-null user_id points to an existing clean.users record
 
 TODO:
   - implement deeper event reconciliation and anomaly handling after the notebook-backed pass
@@ -29,5 +30,7 @@ CREATE TABLE clean.events (
     browser TEXT,
     traffic_source TEXT,
     uri TEXT,
-    event_type TEXT
+    event_type TEXT,
+    CONSTRAINT fk_clean_events_user_id
+        FOREIGN KEY (user_id) REFERENCES clean.users (user_id)
 );

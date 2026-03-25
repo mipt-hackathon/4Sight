@@ -6,6 +6,7 @@ Cleaning contract inherited from notebooks/Анализ_data_csv.ipynb:
   - drop exact duplicate rows from data.csv before splitting by entity
   - keep only order-level columns retained by the analyst
   - normalize ISO8601 timestamps during ETL loading
+  - enforce that each order belongs to an existing clean.users record
 */
 
 CREATE TABLE clean.orders (
@@ -18,5 +19,7 @@ CREATE TABLE clean.orders (
     returned_at TIMESTAMPTZ,
     shipped_at TIMESTAMPTZ,
     delivered_at TIMESTAMPTZ,
-    num_of_item INTEGER NOT NULL
+    num_of_item INTEGER NOT NULL,
+    CONSTRAINT fk_clean_orders_user_id
+        FOREIGN KEY (user_id) REFERENCES clean.users (user_id)
 );

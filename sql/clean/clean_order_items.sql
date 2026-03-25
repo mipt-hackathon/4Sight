@@ -11,6 +11,7 @@ Cleaning contract inherited from notebooks/Анализ_data_csv.ipynb:
   - remove geometry source columns:
       user_geom, distribution_center_geom
   - remove sold_at because the notebook drops it from the cleaned dataset
+  - enforce links back to the owning order and user
 */
 
 CREATE TABLE clean.order_items (
@@ -34,5 +35,9 @@ CREATE TABLE clean.order_items (
     warehouse_longitude DOUBLE PRECISION,
     warehouse_latitude DOUBLE PRECISION,
     product_name TEXT,
-    customer_review TEXT
+    customer_review TEXT,
+    CONSTRAINT fk_clean_order_items_order_id
+        FOREIGN KEY (order_id) REFERENCES clean.orders (order_id),
+    CONSTRAINT fk_clean_order_items_user_id
+        FOREIGN KEY (user_id) REFERENCES clean.users (user_id)
 );
