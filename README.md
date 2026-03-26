@@ -74,6 +74,7 @@
 - `sql/clean/clean_order_items.sql`
 - `sql/clean/clean_events.sql`
 - ERD `clean`-слоя вынесен в [docs/architecture/clean_erd.puml](docs/architecture/clean_erd.puml)
+- ERD `mart`-слоя вынесен в [docs/architecture/mart_erd.puml](docs/architecture/mart_erd.puml)
 
 ## Что сейчас делает marts-builder
 

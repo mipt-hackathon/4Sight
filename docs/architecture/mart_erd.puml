@@ -1,0 +1,115 @@
+@startuml
+left to right direction
+hide methods
+' hide stereotypes
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+title Mart Layer ERD
+
+entity "mart.sales_daily" as sales_daily {
+  * sales_date : DATE
+  --
+  orders_count : BIGINT
+  customers_count : BIGINT
+  order_items_count : BIGINT
+  gross_revenue : NUMERIC(14,2)
+  avg_item_price : NUMERIC(14,2)
+  avg_order_value : NUMERIC(14,2)
+  completed_orders_count : BIGINT
+  shipped_orders_count : BIGINT
+  cancelled_orders_count : BIGINT
+  returned_orders_count : BIGINT
+}
+
+note top of sales_daily
+  Логическая схема витринного слоя.
+  В витринном слое внешние ключи
+  сейчас не заданы как ограничения.
+end note
+
+entity "mart.behavior_metrics" as behavior_metrics {
+  * user_id : BIGINT
+  --
+  first_event_at : TIMESTAMPTZ
+  last_event_at : TIMESTAMPTZ
+  event_count : BIGINT
+  session_count : BIGINT
+  home_events_count : BIGINT
+  department_events_count : BIGINT
+  product_events_count : BIGINT
+  cart_events_count : BIGINT
+  purchase_events_count : BIGINT
+  cancel_events_count : BIGINT
+  days_since_last_event : INTEGER
+}
+
+entity "mart.customer_360" as customer_360 {
+  * user_id : BIGINT
+  --
+  gender : TEXT
+  first_name : TEXT
+  last_name : TEXT
+  email : TEXT
+  age : INTEGER
+  state : TEXT
+  city : TEXT
+  country : TEXT
+  traffic_source : TEXT
+  is_loyal : BOOLEAN
+  first_order_at : TIMESTAMPTZ
+  last_order_at : TIMESTAMPTZ
+  orders_count : BIGINT
+  completed_orders_count : BIGINT
+  shipped_orders_count : BIGINT
+  cancelled_orders_count : BIGINT
+  returned_orders_count : BIGINT
+  order_items_count : BIGINT
+  total_revenue : NUMERIC(14,2)
+  avg_order_value : NUMERIC(14,2)
+  days_since_last_order : INTEGER
+  first_event_at : TIMESTAMPTZ
+  last_event_at : TIMESTAMPTZ
+  event_count : BIGINT
+  session_count : BIGINT
+  home_events_count : BIGINT
+  department_events_count : BIGINT
+  product_events_count : BIGINT
+  cart_events_count : BIGINT
+  purchase_events_count : BIGINT
+  cancel_events_count : BIGINT
+  days_since_last_event : INTEGER
+}
+
+entity "mart.rfm" as rfm {
+  * user_id : BIGINT
+  --
+  recency_days : INTEGER
+  frequency_orders : BIGINT
+  monetary_value : NUMERIC(14,2)
+  recency_score : INTEGER
+  frequency_score : INTEGER
+  monetary_score : INTEGER
+  rfm_score : TEXT
+  rfm_segment : TEXT
+}
+
+customer_360 ||--|| behavior_metrics
+customer_360 ||--|| rfm
+
+note bottom of sales_daily
+  sales_daily — независимая
+  агрегированная витрина по дате.
+end note
+
+note bottom of customer_360
+  customer_360 использует метрики
+  поведения и агрегаты по заказам.
+end note
+
+note bottom of rfm
+  rfm полностью рассчитывается
+  на основе customer_360.
+end note
+
+@enduml
