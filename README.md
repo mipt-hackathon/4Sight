@@ -16,17 +16,19 @@
 - `apps/ml_api`: отдельный FastAPI сервис под inference contracts
 - `apps/frontend`: Next.js placeholder frontend
 - `jobs/etl`: рабочий ETL для загрузки `data/raw/*.csv` в `clean.*`
-- `jobs/marts_builder`, `jobs/feature_builder`, `jobs/train`, `jobs/batch_scoring`: scaffold CLI для следующих этапов пайплайна
+- `jobs/marts_builder`: рабочий mart refresh runner для первых витрин в `mart.*`
+- `jobs/feature_builder`, `jobs/train`, `jobs/batch_scoring`: scaffold CLI для следующих этапов пайплайна
 - `sql/clean`: явный DDL контракт `clean.*`
-- `sql/mart`, `sql/feature`, `sql/serving`: заготовки под витрины, признаки и serving-слой
+- `sql/mart`: первые runnable витрины плюс дополнительные заготовки под развитие слоя
+- `sql/feature`, `sql/serving`: заготовки под признаки и serving-слой
 - `apps/backend/alembic`: foundational DDL через Alembic
 - `infra/superset`: Superset с отдельной metadata DB и read-only подключением к аналитической БД
 
 ## Что пока остается заглушкой
 
 - дополнительные бизнес-правила и обогащение поверх уже реализованного notebook-backed `clean`-слоя
-- mart / feature / serving SQL
-- реальный SQL runner для `marts_builder` и `feature_builder`
+- часть mart / feature / serving SQL
+- реальный SQL runner для `feature_builder`
 - обучение моделей
 - batch scoring с реальными моделями
 - auth
@@ -71,6 +73,19 @@
 - `sql/clean/clean_orders.sql`
 - `sql/clean/clean_order_items.sql`
 - `sql/clean/clean_events.sql`
+- ERD `clean`-слоя вынесен в [docs/architecture/clean_erd.puml](/mnt/c/DEV/MIPT/2%20sem/hackathon/repo/docs/architecture/clean_erd.puml)
+
+## Что сейчас делает marts-builder
+
+Текущий `marts_builder` уже исполняет первые осмысленные витрины из `sql/mart/`:
+- `mart.sales_daily`: дневные продажи, выручка, число заказов и клиентов
+- `mart.behavior_metrics`: пользовательские event/session aggregates по `clean.events`
+- `mart.customer_360`: customer-level срез, который объединяет профиль, заказы и поведение
+- `mart.rfm`: базовая RFM-сегментация поверх `mart.customer_360`
+
+Это уже показывает intended flow:
+- `clean.*` хранит очищенные сущности
+- `mart.*` хранит reusable аналитические агрегаты для BI, backend и будущих feature tables
 
 ## Структура репозитория
 
@@ -213,7 +228,7 @@ docker compose --env-file .env run --rm etl
 docker compose --env-file .env run --rm marts-builder
 ```
 
-Важно: сейчас `marts-builder` пока только scaffold CLI. Он еще не исполняет SQL автоматически, но это и есть следующий ожидаемый шаг для data engineer.
+Это уже рабочий шаг. Сейчас `marts-builder` исполняет первые реализованные SQL-файлы из `sql/mart/` в контролируемом порядке и пересобирает `mart.sales_daily`, `mart.behavior_metrics`, `mart.customer_360` и `mart.rfm`.
 
 ### Запустить scaffold feature job
 

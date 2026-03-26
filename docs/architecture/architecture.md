@@ -1,20 +1,26 @@
-# Architecture Overview
 
-This scaffold keeps backend, ML, BI, SQL, and batch responsibilities separate so the team can implement in parallel without inventing structure later.
-
-## High-Level Architecture
+## High-Level data flow
 
 ```mermaid
+
 flowchart LR
-    raw["Mounted CSV Files\n(data.csv, events.csv)"] --> etl["ETL Jobs"]
-    etl --> pg["PostgreSQL\nclean / mart / feature / serving"]
-    pg --> backend["FastAPI Backend"]
-    pg --> superset["Apache Superset"]
-    pg --> ml["FastAPI ML API"]
-    ml --> backend
-    backend --> frontend["Next.js Frontend"]
-    redis["Redis"] --> backend
-    redis --> ml
+    data_csv["data.csv"] --> etl["jobs/ etl
+    parsers / validators / extract / transform / load to db"]
+    events_csv["events.csv"] --> etl
+    etl --> clean["PostgreSQL очищенные таблички"]
+    clean --> marts["jobs/marts_builder"]
+
+    marts --> mart["PostgreSQL: витринные таблички"]
+    mart --> features_job["jobs/feature_builder"] & backend["apps/backend"] & superset["Superset"]
+    features_job --> feature["PostgreSQL: таблички с дополнительными показателями (под ML)"]
+    feature --> train["jobs/train"] & batch["jobs/batch_scoring"] & mlapi["apps/ml_api"]
+    train --> artifacts["artifacts/models/*"]
+    artifacts --> batch & mlapi
+
+    batch --> serving["PostgreSQL: итоговые таблички"]
+    serving --> backend & superset
+    backend --> frontend["apps/frontend"]
+    mlapi <---> backend
 ```
 
 ## Docker Compose Services
