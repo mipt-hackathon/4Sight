@@ -22,3 +22,12 @@ repos:
         additional_dependencies:
           - prettier@3.5.3
         files: ^apps/frontend/
+        types_or:
+          - javascript
+          - jsx
+          - ts
+          - tsx
+          - css
+          - json
+          - yaml
+          - markdown

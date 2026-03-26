@@ -30,7 +30,7 @@ WITH order_metrics AS (
         COUNT(DISTINCT CASE WHEN o.status = 'Returned' THEN o.order_id END) AS returned_orders_count,
         COUNT(oi.order_item_id) AS order_items_count,
         COALESCE(SUM(oi.sale_price), 0)::NUMERIC(14, 2) AS total_revenue,
-        EXTRACT(DAY FROM (CURRENT_TIMESTAMP - MAX(o.created_at)))::INTEGER AS days_since_last_order
+        CURRENT_DATE - MAX(o.created_at)::date AS days_since_last_order
     FROM clean.orders AS o
     JOIN clean.order_items AS oi
         ON oi.order_id = o.order_id
