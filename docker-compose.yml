@@ -1,0 +1,262 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      BI_READONLY_USER: ${BI_READONLY_USER:-bi_readonly}
+      BI_READONLY_PASSWORD: ${BI_READONLY_PASSWORD:-bi_readonly}
+      SUPERSET_METADATA_DB: ${SUPERSET_METADATA_DB:-superset_metadata}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    env_file:
+      - .env
+    working_dir: /workspace/apps/backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      APP_NAME: ${BACKEND_APP_NAME}
+      APP_ENV: ${APP_ENV}
+      APP_LOG_LEVEL: ${APP_LOG_LEVEL}
+      POSTGRES_DSN: ${POSTGRES_DSN}
+      ALEMBIC_DATABASE_URL: ${ALEMBIC_DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      BI_READONLY_USER: ${BI_READONLY_USER:-bi_readonly}
+      PYTHONPATH: /workspace/libs/common/src
+    ports:
+      - "${BACKEND_PORT}:8000"
+    volumes:
+      - ./apps/backend:/workspace/apps/backend
+      - ./libs/common:/workspace/libs/common
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  ml-api:
+    build:
+      context: .
+      dockerfile: apps/ml_api/Dockerfile
+    env_file:
+      - .env
+    working_dir: /workspace/apps/ml_api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
+    environment:
+      APP_NAME: ${ML_API_APP_NAME}
+      APP_ENV: ${APP_ENV}
+      APP_LOG_LEVEL: ${APP_LOG_LEVEL}
+      POSTGRES_DSN: ${POSTGRES_DSN}
+      REDIS_URL: ${REDIS_URL}
+      PYTHONPATH: /workspace/libs/common/src
+    ports:
+      - "${ML_API_PORT}:8001"
+    volumes:
+      - ./apps/ml_api:/workspace/apps/ml_api
+      - ./libs/common:/workspace/libs/common
+      - ./artifacts/models:/workspace/artifacts/models
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    env_file:
+      - .env
+    working_dir: /workspace/apps/frontend
+    command: npm run dev -- --hostname 0.0.0.0 --port 3000
+    environment:
+      NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
+      NEXT_PUBLIC_ML_API_URL: ${NEXT_PUBLIC_ML_API_URL}
+      CHOKIDAR_USEPOLLING: "true"
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    volumes:
+      - ./apps/frontend:/workspace/apps/frontend
+      - frontend_node_modules:/workspace/apps/frontend/node_modules
+    depends_on:
+      - backend
+      - ml-api
+
+  superset:
+    build:
+      context: .
+      dockerfile: infra/superset/Dockerfile
+    env_file:
+      - .env
+    environment:
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
+      SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME}
+      SUPERSET_ADMIN_FIRSTNAME: ${SUPERSET_ADMIN_FIRSTNAME}
+      SUPERSET_ADMIN_LASTNAME: ${SUPERSET_ADMIN_LASTNAME}
+      SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL}
+      SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
+      SUPERSET_DATABASE_URI: ${SUPERSET_DATABASE_URI:-postgresql+psycopg2://retail:retail@postgres:5432/retail_analytics}
+      SUPERSET_ANALYTICS_DATABASE_URI: ${SUPERSET_ANALYTICS_DATABASE_URI:-postgresql+psycopg2://bi_readonly:bi_readonly@postgres:5432/retail_analytics}
+      PYTHONPATH: /app/pythonpath
+    command: ["/app/docker/init.sh"]
+    ports:
+      - "${SUPERSET_PORT}:8088"
+    volumes:
+      - superset_home:/app/superset_home
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  etl:
+    build:
+      context: .
+      dockerfile: jobs/Dockerfile
+    profiles: ["jobs"]
+    env_file:
+      - .env
+    working_dir: /workspace/jobs/etl
+    command: python -m etl.cli
+    environment:
+      APP_NAME: retail-analytics-etl
+      APP_ENV: ${APP_ENV}
+      APP_LOG_LEVEL: ${APP_LOG_LEVEL}
+      POSTGRES_DSN: ${POSTGRES_DSN}
+      REDIS_URL: ${REDIS_URL}
+      PYTHONPATH: /workspace/libs/common/src:/workspace/jobs
+    volumes:
+      - ./jobs/etl:/workspace/jobs/etl
+      - ./libs/common:/workspace/libs/common
+      - ./data/raw:/workspace/data/raw
+      - ./sql:/workspace/sql
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  marts-builder:
+    build:
+      context: .
+      dockerfile: jobs/Dockerfile
+    profiles: ["jobs"]
+    env_file:
+      - .env
+    working_dir: /workspace/jobs/marts_builder
+    command: python -m marts_builder.cli
+    environment:
+      APP_NAME: retail-analytics-marts-builder
+      APP_ENV: ${APP_ENV}
+      APP_LOG_LEVEL: ${APP_LOG_LEVEL}
+      POSTGRES_DSN: ${POSTGRES_DSN}
+      PYTHONPATH: /workspace/libs/common/src:/workspace/jobs
+    volumes:
+      - ./jobs/marts_builder:/workspace/jobs/marts_builder
+      - ./libs/common:/workspace/libs/common
+      - ./sql:/workspace/sql
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  feature-builder:
+    build:
+      context: .
+      dockerfile: jobs/Dockerfile
+    profiles: ["jobs"]
+    env_file:
+      - .env
+    working_dir: /workspace/jobs/feature_builder
+    command: python -m feature_builder.cli
+    environment:
+      APP_NAME: retail-analytics-feature-builder
+      APP_ENV: ${APP_ENV}
+      APP_LOG_LEVEL: ${APP_LOG_LEVEL}
+      POSTGRES_DSN: ${POSTGRES_DSN}
+      PYTHONPATH: /workspace/libs/common/src:/workspace/jobs
+    volumes:
+      - ./jobs/feature_builder:/workspace/jobs/feature_builder
+      - ./libs/common:/workspace/libs/common
+      - ./sql:/workspace/sql
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  train:
+    build:
+      context: .
+      dockerfile: jobs/Dockerfile
+    profiles: ["jobs"]
+    env_file:
+      - .env
+    working_dir: /workspace/jobs/train
+    command: python -m train.cli
+    environment:
+      APP_NAME: retail-analytics-train
+      APP_ENV: ${APP_ENV}
+      APP_LOG_LEVEL: ${APP_LOG_LEVEL}
+      POSTGRES_DSN: ${POSTGRES_DSN}
+      PYTHONPATH: /workspace/libs/common/src:/workspace/jobs
+    volumes:
+      - ./jobs/train:/workspace/jobs/train
+      - ./libs/common:/workspace/libs/common
+      - ./artifacts/models:/workspace/artifacts/models
+      - ./sql:/workspace/sql
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  batch-scoring:
+    build:
+      context: .
+      dockerfile: jobs/Dockerfile
+    profiles: ["jobs"]
+    env_file:
+      - .env
+    working_dir: /workspace/jobs/batch_scoring
+    command: python -m batch_scoring.cli
+    environment:
+      APP_NAME: retail-analytics-batch-scoring
+      APP_ENV: ${APP_ENV}
+      APP_LOG_LEVEL: ${APP_LOG_LEVEL}
+      POSTGRES_DSN: ${POSTGRES_DSN}
+      PYTHONPATH: /workspace/libs/common/src:/workspace/jobs
+    volumes:
+      - ./jobs/batch_scoring:/workspace/jobs/batch_scoring
+      - ./libs/common:/workspace/libs/common
+      - ./artifacts/models:/workspace/artifacts/models
+      - ./sql:/workspace/sql
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
+  superset_home:
+  frontend_node_modules:
