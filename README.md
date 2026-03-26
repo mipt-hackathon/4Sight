@@ -119,7 +119,7 @@ Copy-Item .env.example .env
 
 ## Настройка pre-commit
 
-В репозитории уже есть конфиг [`.pre-commit-config.yaml`](/mnt/c/DEV/MIPT/2%20sem/hackathon/repo/.pre-commit-config.yaml) с базовыми проверками:
+В репозитории уже есть конфиг [`.pre-commit-config.yaml`](./.pre-commit-config.yaml) с базовыми проверками:
 - `ruff` и `ruff-format` для Python-кода
 - базовые git/yaml hooks
 - `prettier` для файлов во frontend
