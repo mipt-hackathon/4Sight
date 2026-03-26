@@ -33,6 +33,29 @@ services:
       timeout: 5s
       retries: 5
 
+  migrator:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    env_file:
+      - .env
+    working_dir: /workspace/apps/backend
+    command: alembic upgrade head
+    environment:
+      APP_NAME: ${BACKEND_APP_NAME}
+      APP_ENV: ${APP_ENV}
+      APP_LOG_LEVEL: ${APP_LOG_LEVEL}
+      POSTGRES_DSN: ${POSTGRES_DSN}
+      ALEMBIC_DATABASE_URL: ${ALEMBIC_DATABASE_URL}
+      BI_READONLY_USER: ${BI_READONLY_USER:-bi_readonly}
+      PYTHONPATH: /workspace/libs/common/src
+    volumes:
+      - ./apps/backend:/workspace/apps/backend
+      - ./libs/common:/workspace/libs/common
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   backend:
     build:
       context: .
@@ -60,6 +83,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
 
   ml-api:
     build:
@@ -87,6 +112,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
 
   frontend:
     build:

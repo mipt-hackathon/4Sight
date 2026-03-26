@@ -9,6 +9,7 @@
 - локальная инфраструктура через Docker Compose.
 
 В проекте намеренно не используется отдельный task runner. Все основные сценарии ниже описаны прямыми командами `docker compose`, чтобы workflow был одинаково понятен на Windows, macOS и Linux.
+Docker Compose по умолчанию читает `.env` из корня репозитория, поэтому отдельный `--env-file .env` в командах не нужен.
 
 ## Что уже сделано
 
@@ -153,25 +154,19 @@ python -m pre_commit run --all-files
 
 ## Быстрый старт
 
-### 1. Поднять Postgres и Redis
+### 1. Поднять основной локальный стек
 
 ```bash
-docker compose --env-file .env up -d postgres redis
+docker compose up -d --build
 ```
 
-### 2. Применить миграции Alembic
+Эта команда:
+- поднимет `postgres` и `redis`
+- запустит one-shot `migrator` с `alembic upgrade head`
+- после успешной миграции поднимет `backend`, `ml-api`, `frontend` и `superset`
+- не будет запускать batch/job сервисы из `profiles: ["jobs"]`
 
-```bash
-docker compose --env-file .env run --rm --no-deps backend alembic upgrade head
-```
-
-### 3. Поднять основной локальный стек
-
-```bash
-docker compose --env-file .env up --build -d postgres redis backend ml-api frontend superset
-```
-
-### 4. Открыть сервисы
+### 2. Открыть сервисы
 
 - Frontend: [http://localhost:13000](http://localhost:13000)
 - Backend docs: [http://localhost:18000/docs](http://localhost:18000/docs)
@@ -183,38 +178,43 @@ docker compose --env-file .env up --build -d postgres redis backend ml-api front
 ### Bootstrap новой локальной базы
 
 ```bash
-docker compose --env-file .env up -d postgres redis
-docker compose --env-file .env run --rm --no-deps backend alembic upgrade head
+docker compose up -d --build
 ```
 
 ### Полный запуск основного стека
 
 ```bash
-docker compose --env-file .env up --build -d postgres redis backend ml-api frontend superset
+docker compose up -d --build
 ```
 
 ### Остановить стек
 
 ```bash
-docker compose --env-file .env down
+docker compose down
 ```
 
 ### Посмотреть логи
 
 ```bash
-docker compose --env-file .env logs -f --tail=200
+docker compose logs -f --tail=200
+```
+
+### Повторно прогнать миграции
+
+```bash
+docker compose run --rm migrator
 ```
 
 ### Узнать текущую ревизию Alembic
 
 ```bash
-docker compose --env-file .env run --rm --no-deps backend alembic current
+docker compose run --rm migrator alembic current
 ```
 
 ### Загрузить clean-слой из CSV
 
 ```bash
-docker compose --env-file .env run --rm etl
+docker compose run --rm etl
 ```
 
 Это реально рабочий шаг. После него в БД появятся:
@@ -226,7 +226,7 @@ docker compose --env-file .env run --rm etl
 ### Запустить scaffold mart job
 
 ```bash
-docker compose --env-file .env run --rm marts-builder
+docker compose run --rm marts-builder
 ```
 
 Это уже рабочий шаг. Сейчас `marts-builder` исполняет первые реализованные SQL-файлы из `sql/mart/` в контролируемом порядке и пересобирает `mart.sales_daily`, `mart.behavior_metrics`, `mart.customer_360` и `mart.rfm`.
@@ -234,29 +234,29 @@ docker compose --env-file .env run --rm marts-builder
 ### Запустить scaffold feature job
 
 ```bash
-docker compose --env-file .env run --rm feature-builder
+docker compose run --rm feature-builder
 ```
 
 ### Запустить scaffold training job
 
 ```bash
-docker compose --env-file .env run --rm train
+docker compose run --rm train
 ```
 
 ### Запустить scaffold batch scoring job
 
 ```bash
-docker compose --env-file .env run --rm batch-scoring
+docker compose run --rm batch-scoring
 ```
 
 ### Прогнать пайплайн по шагам
 
 ```bash
-docker compose --env-file .env run --rm etl
-docker compose --env-file .env run --rm marts-builder
-docker compose --env-file .env run --rm feature-builder
-docker compose --env-file .env run --rm train
-docker compose --env-file .env run --rm batch-scoring
+docker compose run --rm etl
+docker compose run --rm marts-builder
+docker compose run --rm feature-builder
+docker compose run --rm train
+docker compose run --rm batch-scoring
 ```
 
 ## Работа с контейнерами и БД
@@ -264,25 +264,25 @@ docker compose --env-file .env run --rm batch-scoring
 ### Shell в backend
 
 ```bash
-docker compose --env-file .env run --rm backend bash
+docker compose run --rm backend bash
 ```
 
 ### Shell в ml-api
 
 ```bash
-docker compose --env-file .env run --rm ml-api bash
+docker compose run --rm ml-api bash
 ```
 
 ### Shell внутри Postgres-контейнера
 
 ```bash
-docker compose --env-file .env exec postgres sh
+docker compose exec postgres sh
 ```
 
 ### Открыть `psql`
 
 ```bash
-docker compose --env-file .env exec postgres sh -lc 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
+docker compose exec postgres sh -lc 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
 ```
 
 Если quoting в твоем shell неудобен, можно зайти через `sh`, а потом уже запустить:
@@ -296,9 +296,8 @@ psql -U retail -d retail_analytics
 Эта команда удаляет локальные volumes PostgreSQL и Redis.
 
 ```bash
-docker compose --env-file .env down -v
-docker compose --env-file .env up -d postgres redis
-docker compose --env-file .env run --rm --no-deps backend alembic upgrade head
+docker compose down -v
+docker compose up -d --build
 ```
 
 После этого `clean.*`, `mart.*`, `feature.*` и `serving.*` нужно собирать заново.
