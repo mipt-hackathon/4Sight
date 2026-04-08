@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+# WARNING:
+#   This script runs `docker compose down -v` and deletes local compose volumes.
+#   It is intended only for clean dev/demo bootstrap.
+
 # DEV/DEMO SCRIPT — NOT FOR PRODUCTION USE.
 #
 # Bootstraps the churn happy-path in the local Docker Compose stack.
@@ -9,8 +14,7 @@
 #
 # Prerequisites:
 #   - Docker and Docker Compose are installed and running.
-#   - A .env file exists at the project root with POSTGRES_USER, POSTGRES_DB, etc.
-#     (same .env used by docker compose).
+#   - A .env file exists at the project root (same .env used by docker compose)
 
 set -euo pipefail
 
@@ -19,14 +23,15 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 cd "$PROJECT_ROOT"
 
-# Load DB credentials from .env so we can pass them to psql.
-# Only load the variables we actually need; do not export the entire .env blindly.
-if [[ -f .env ]]; then
-    POSTGRES_USER=$(grep -E '^POSTGRES_USER=' .env | cut -d= -f2 | tr -d '"' || true)
-    POSTGRES_DB=$(grep -E '^POSTGRES_DB=' .env | cut -d= -f2 | tr -d '"' || true)
-fi
-POSTGRES_USER="${POSTGRES_USER:-retail}"
-POSTGRES_DB="${POSTGRES_DB:-retail_analytics}"
+# Demo-only hardcoded DB access parameters for the local compose stack.
+POSTGRES_USER="retail"
+POSTGRES_DB="retail_analytics"
+
+# WARNING:
+#   This script runs `docker compose down -v` and deletes local compose volumes.
+#   It is intended only for clean dev/demo bootstrap.
+echo "==> [0/6] Resetting local demo state (containers + volumes)..."
+docker compose down -v
 
 echo "==> [1/6] Starting postgres and redis..."
 docker compose up -d postgres redis
@@ -40,16 +45,14 @@ echo "==> [3/6] Running migrator to apply all Alembic migrations..."
 docker compose run --rm migrator
 
 echo "==> [4/6] Applying churn registry seed..."
-docker compose exec -T postgres psql \
-    -U "$POSTGRES_USER" \
-    -d "$POSTGRES_DB" \
-    < sql/seeds/churn_registry_seed.sql
+cat sql/seeds/churn_registry_seed.sql | docker compose exec -T postgres psql \
+  -U "$POSTGRES_USER" \
+  -d "$POSTGRES_DB"
 
 echo "==> [5/6] Applying churn feature seed..."
-docker compose exec -T postgres psql \
-    -U "$POSTGRES_USER" \
-    -d "$POSTGRES_DB" \
-    < sql/seeds/churn_feature_seed.sql
+cat sql/seeds/churn_feature_seed.sql | docker compose exec -T postgres psql \
+  -U "$POSTGRES_USER" \
+  -d "$POSTGRES_DB"
 
 echo "==> [6a/6] Generating churn demo model artifacts inside the ml-api container..."
 docker compose run --rm ml-api \
