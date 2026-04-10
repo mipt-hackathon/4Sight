@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /workspace
 
 COPY requirements /workspace/requirements
-RUN pip install --no-cache-dir -r /workspace/requirements/base.txt
+RUN pip install --no-cache-dir -r /workspace/requirements/ml_api.txt
 
 COPY libs/common /workspace/libs/common
 COPY apps/ml_api /workspace/apps/ml_api
