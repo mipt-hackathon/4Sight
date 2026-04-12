@@ -1,5 +1,12 @@
 # Retail Analytics Hackathon Monorepo
 
+## Отчеты для сдачи черновика решения
+- [ML API](./docs/reports//ml_api_report_draft.md)
+
+---
+
+## Общее описание решения и репозитория
+
 Это монорепо для хакатонного проекта по retail analytics. Здесь разделены:
 - продуктовый backend,
 - отдельный ML API,

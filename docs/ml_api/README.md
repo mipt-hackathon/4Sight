@@ -4,3 +4,4 @@
 - [Как устроен сервис (схематично)](./ml_api_components.md)
 - [Текущее состояние / TODO](./ml_api_status.md)
 - [Integration notes для apps/backend](./ml_api_and_apps_backend_inegration_notes.md)
+- [Отчет для сдачи черновика решения](../reports//ml_api_report_draft.md)
