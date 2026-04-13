@@ -15,10 +15,10 @@ _PRIMARY_QUERY = text(
 
 _FALLBACK_QUERY = text(
     """
-    SELECT date, revenue AS value
+    SELECT sales_date AS date, gross_revenue AS value
     FROM mart.sales_daily
-    WHERE entity_id = :eid OR :eid = 'all'
-    ORDER BY date DESC
+    WHERE (:eid = 'all')
+    ORDER BY sales_date DESC
     LIMIT :lim
     """
 )
@@ -37,15 +37,19 @@ class ForecastFeatureRepositoryImpl:
         with self._engine.connect() as conn:
             rows: list[dict[str, Any]] | None = None
             try:
-                result = conn.execute(_PRIMARY_QUERY, {"eid": entity_id, "lim": lim}).mappings().all()
+                result = (
+                    conn.execute(_PRIMARY_QUERY, {"eid": entity_id, "lim": lim}).mappings().all()
+                )
                 if result:
                     logger.debug("feature_source=feature.forecast entity_id=%s", entity_id)
                     rows = [dict(r) for r in result]
             except ProgrammingError:
-                pass
+                conn.rollback()
 
             if rows is None:
-                result = conn.execute(_FALLBACK_QUERY, {"eid": entity_id, "lim": lim}).mappings().all()
+                result = (
+                    conn.execute(_FALLBACK_QUERY, {"eid": entity_id, "lim": lim}).mappings().all()
+                )
                 if not result:
                     return None
                 logger.debug("feature_source=mart_fallback entity_id=%s", entity_id)

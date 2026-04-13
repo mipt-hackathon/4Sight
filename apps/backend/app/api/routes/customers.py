@@ -1,36 +1,55 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, Query
+
+from app.api.models import (
+    CustomerChurnResponse,
+    CustomerProfileResponse,
+    CustomerRecommendationsResponse,
+    CustomerSearchResponse,
+    HighRiskCustomersResponse,
+)
+from app.dependencies import get_retail_app_service
+from app.services.retail_app_service import RetailAppService
 
 router = APIRouter()
 
 
-@router.get("/{user_id}")
-def get_customer_profile(user_id: str) -> dict:
-    # TODO: Serve curated customer profile assembled from mart.customer_360.
-    return {
-        "status": "stub",
-        "user_id": user_id,
-        "profile": None,
-        "todo": "Implement customer profile lookup from curated and serving tables.",
-    }
+@router.get("/search", response_model=CustomerSearchResponse)
+def search_customers(
+    q: str | None = Query(default=None, min_length=1),
+    limit: int = Query(default=20, ge=1, le=100),
+    service: RetailAppService = Depends(get_retail_app_service),
+) -> CustomerSearchResponse:
+    return service.search_customers(query=q, limit=limit)
 
 
-@router.get("/{user_id}/churn")
-def get_customer_churn(user_id: str) -> dict:
-    # TODO: Proxy or fetch churn outputs from serving tables / ml-api integration.
-    return {
-        "status": "stub",
-        "user_id": user_id,
-        "churn": None,
-        "todo": "Implement churn score retrieval and explanation payload.",
-    }
+@router.get("/high-risk", response_model=HighRiskCustomersResponse)
+def list_high_risk_customers(
+    limit: int = Query(default=20, ge=1, le=100),
+    service: RetailAppService = Depends(get_retail_app_service),
+) -> HighRiskCustomersResponse:
+    return service.list_high_risk_customers(limit=limit)
 
 
-@router.get("/{user_id}/recommendations")
-def get_customer_recommendations(user_id: str) -> dict:
-    # TODO: Return ranked products once recommendation serving is implemented.
-    return {
-        "status": "stub",
-        "user_id": user_id,
-        "recommendations": [],
-        "todo": "Implement product recommendation retrieval for the MVP app.",
-    }
+@router.get("/{user_id}", response_model=CustomerProfileResponse)
+def get_customer_profile(
+    user_id: int,
+    service: RetailAppService = Depends(get_retail_app_service),
+) -> CustomerProfileResponse:
+    return service.get_customer_profile(user_id)
+
+
+@router.get("/{user_id}/churn", response_model=CustomerChurnResponse)
+def get_customer_churn(
+    user_id: int,
+    service: RetailAppService = Depends(get_retail_app_service),
+) -> CustomerChurnResponse:
+    return service.get_customer_churn(user_id)
+
+
+@router.get("/{user_id}/recommendations", response_model=CustomerRecommendationsResponse)
+def get_customer_recommendations(
+    user_id: int,
+    limit: int = Query(default=5, ge=1, le=20),
+    service: RetailAppService = Depends(get_retail_app_service),
+) -> CustomerRecommendationsResponse:
+    return service.get_customer_recommendations(user_id, limit=limit)

@@ -1,0 +1,153 @@
+table_name: customer_abc_monthly
+main_dttm_col: year_month
+description: Notebook-backed monthly customer ABC dynamics.
+default_endpoint: null
+offset: 0
+cache_timeout: null
+catalog: retail_analytics
+schema: mart
+database_uuid: 73e7590d-077a-4c05-a28b-f13d9a3324d1
+sql: null
+params: null
+template_params: null
+filter_select_enabled: true
+fetch_values_predicate: null
+extra: null
+normalize_columns: false
+always_filter_main_dttm: false
+uuid: 44ae6479-ec5b-4b98-8bba-bee84cd32daf
+metrics:
+  - metric_name: a_customers_sum
+    verbose_name: SUM(a_customers)
+    metric_type: null
+    expression: SUM(a_customers)
+    description: null
+    d3format: null
+    extra: null
+    warning_text: null
+  - metric_name: b_customers_sum
+    verbose_name: SUM(b_customers)
+    metric_type: null
+    expression: SUM(b_customers)
+    description: null
+    d3format: null
+    extra: null
+    warning_text: null
+  - metric_name: c_customers_sum
+    verbose_name: SUM(c_customers)
+    metric_type: null
+    expression: SUM(c_customers)
+    description: null
+    d3format: null
+    extra: null
+    warning_text: null
+  - metric_name: a_percent_avg
+    verbose_name: AVG(a_percent)
+    metric_type: null
+    expression: AVG(a_percent)
+    description: null
+    d3format: null
+    extra: null
+    warning_text: null
+  - metric_name: b_percent_avg
+    verbose_name: AVG(b_percent)
+    metric_type: null
+    expression: AVG(b_percent)
+    description: null
+    d3format: null
+    extra: null
+    warning_text: null
+  - metric_name: c_percent_avg
+    verbose_name: AVG(c_percent)
+    metric_type: null
+    expression: AVG(c_percent)
+    description: null
+    d3format: null
+    extra: null
+    warning_text: null
+columns:
+  - column_name: year_month
+    verbose_name: null
+    is_dttm: true
+    is_active: true
+    type: DATE
+    advanced_data_type: null
+    groupby: true
+    filterable: true
+    expression: null
+    description: null
+    python_date_format: null
+    extra: null
+  - column_name: a_customers
+    verbose_name: null
+    is_dttm: false
+    is_active: true
+    type: BIGINT
+    advanced_data_type: null
+    groupby: true
+    filterable: true
+    expression: null
+    description: null
+    python_date_format: null
+    extra: null
+  - column_name: b_customers
+    verbose_name: null
+    is_dttm: false
+    is_active: true
+    type: BIGINT
+    advanced_data_type: null
+    groupby: true
+    filterable: true
+    expression: null
+    description: null
+    python_date_format: null
+    extra: null
+  - column_name: c_customers
+    verbose_name: null
+    is_dttm: false
+    is_active: true
+    type: BIGINT
+    advanced_data_type: null
+    groupby: true
+    filterable: true
+    expression: null
+    description: null
+    python_date_format: null
+    extra: null
+  - column_name: a_percent
+    verbose_name: null
+    is_dttm: false
+    is_active: true
+    type: NUMERIC(14, 2)
+    advanced_data_type: null
+    groupby: true
+    filterable: true
+    expression: null
+    description: null
+    python_date_format: null
+    extra: null
+  - column_name: b_percent
+    verbose_name: null
+    is_dttm: false
+    is_active: true
+    type: NUMERIC(14, 2)
+    advanced_data_type: null
+    groupby: true
+    filterable: true
+    expression: null
+    description: null
+    python_date_format: null
+    extra: null
+  - column_name: c_percent
+    verbose_name: null
+    is_dttm: false
+    is_active: true
+    type: NUMERIC(14, 2)
+    advanced_data_type: null
+    groupby: true
+    filterable: true
+    expression: null
+    description: null
+    python_date_format: null
+    extra: null
+version: 1.0.0

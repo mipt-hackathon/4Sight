@@ -1,0 +1,34 @@
+slice_name: "Отток: по категориям возвратов"
+description: Уровень оттока по категориям возвратов из notebook.
+certified_by: null
+certification_details: null
+viz_type: dist_bar
+params:
+  adhoc_filters: []
+  bar_stacked: false
+  bottom_margin: auto
+  color_scheme: supersetColors
+  columns: []
+  contribution: false
+  datasource: 5__table
+  groupby:
+    - returns_category
+  metrics:
+    - churn_rate_pct_avg
+  order_bars: true
+  queryFields:
+    columns: groupby
+    groupby: groupby
+    metrics: metrics
+  row_limit: 100
+  show_bar_value: false
+  show_controls: true
+  show_legend: false
+  viz_type: dist_bar
+  x_axis_label: Категория возвратов
+  x_ticks_layout: flat
+  y_axis_format: SMART_NUMBER
+cache_timeout: null
+uuid: 60a4b33a-9032-4ef3-b791-c17b5e10a7f7
+version: 1.0.0
+dataset_uuid: 6e8cd520-ed7e-4ea1-9884-10df8b2c7fce

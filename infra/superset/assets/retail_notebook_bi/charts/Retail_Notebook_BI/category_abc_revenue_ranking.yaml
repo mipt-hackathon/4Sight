@@ -1,0 +1,34 @@
+slice_name: "ABC: Категории товаров по выручке"
+description: Ранжирование товарных категорий по выручке.
+certified_by: null
+certification_details: null
+viz_type: dist_bar
+params:
+  adhoc_filters: []
+  bar_stacked: false
+  bottom_margin: auto
+  color_scheme: supersetColors
+  columns: []
+  contribution: false
+  datasource: 9__table
+  groupby:
+    - category
+  metrics:
+    - total_revenue_sum
+  order_bars: true
+  queryFields:
+    columns: groupby
+    groupby: groupby
+    metrics: metrics
+  row_limit: 20
+  show_bar_value: false
+  show_controls: true
+  show_legend: false
+  viz_type: dist_bar
+  x_axis_label: Категория товара
+  x_ticks_layout: staggered
+  y_axis_format: SMART_NUMBER
+cache_timeout: null
+uuid: 4d0d8eca-90b2-4371-9415-687221e269b4
+version: 1.0.0
+dataset_uuid: 1cc68a64-0b9e-42a5-85e7-52571ceaf4ba

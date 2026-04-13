@@ -1,0 +1,183 @@
+dashboard_title: "Retail Notebook BI"
+description: "Графики, перенесенные из notebook-анализа ABC/XYZ и RFM поверх mart.rfm и mart.abc_xyz."
+css: null
+slug: retail-notebook-bi
+certified_by: null
+certification_details: null
+published: true
+uuid: 5b72d425-cae7-4d77-aee7-7a79ed33d1bb
+position:
+  DASHBOARD_VERSION_KEY: v2
+  ROOT_ID:
+    children:
+      - GRID_ID
+    id: ROOT_ID
+    type: ROOT
+  GRID_ID:
+    children:
+      - ROW-ABC-1
+      - ROW-ABC-2
+      - ROW-ABC-3
+      - ROW-RFM-1
+      - ROW-RFM-2
+    id: GRID_ID
+    parents:
+      - ROOT_ID
+    type: GRID
+  HEADER_ID:
+    id: HEADER_ID
+    meta:
+      text: Retail Notebook BI
+    type: HEADER
+  CHART-ABC-REV-PROFIT:
+    children: []
+    id: CHART-ABC-REV-PROFIT
+    meta:
+      chartId: 1001
+      height: 50
+      sliceName: "ABC: Выручка и прибыль"
+      uuid: 9e9c03ea-b0e8-46b1-9a33-7d28603df3d0
+      width: 6
+    type: CHART
+  CHART-ABC-FREQ:
+    children: []
+    id: CHART-ABC-FREQ
+    meta:
+      chartId: 1002
+      height: 50
+      sliceName: "ABC: Частота покупок"
+      uuid: 8ce3cd7f-acde-4bdb-9c0c-c8aa701d232d
+      width: 6
+    type: CHART
+  CHART-XYZ-SALES:
+    children: []
+    id: CHART-XYZ-SALES
+    meta:
+      chartId: 1003
+      height: 45
+      sliceName: "XYZ: Распределение по сумме покупок"
+      uuid: 6fb1c262-16de-4c56-b7a1-473d0104cb21
+      width: 6
+    type: CHART
+  CHART-XYZ-ORDERS:
+    children: []
+    id: CHART-XYZ-ORDERS
+    meta:
+      chartId: 1004
+      height: 45
+      sliceName: "XYZ: Распределение по количеству заказов"
+      uuid: 09a29cb9-9555-4cef-9c4a-5b2122ef59dd
+      width: 6
+    type: CHART
+  CHART-ABCXYZ-REV:
+    children: []
+    id: CHART-ABCXYZ-REV
+    meta:
+      chartId: 1005
+      height: 55
+      sliceName: "ABC-XYZ: Матрица выручки"
+      uuid: 75b85992-15ff-4754-b670-2b2b0eec49c3
+      width: 6
+    type: CHART
+  CHART-ABCXYZ-COUNT:
+    children: []
+    id: CHART-ABCXYZ-COUNT
+    meta:
+      chartId: 1006
+      height: 55
+      sliceName: "ABC-XYZ: Матрица клиентов"
+      uuid: a9aa5d58-f557-4cbb-9a7c-0349075cc8b5
+      width: 6
+    type: CHART
+  CHART-RFM-SEGMENTS:
+    children: []
+    id: CHART-RFM-SEGMENTS
+    meta:
+      chartId: 1007
+      height: 50
+      sliceName: "RFM: Сегменты клиентов"
+      uuid: 6300eb8a-8700-4aea-ac04-3014ed2a4b40
+      width: 6
+    type: CHART
+  CHART-RFM-REVENUE:
+    children: []
+    id: CHART-RFM-REVENUE
+    meta:
+      chartId: 1008
+      height: 50
+      sliceName: "RFM: Доля выручки по сегментам"
+      uuid: 2fba9b9a-bfd0-4800-9614-1a305c0d5a16
+      width: 6
+    type: CHART
+  CHART-RFM-MONETARY:
+    children: []
+    id: CHART-RFM-MONETARY
+    meta:
+      chartId: 1009
+      height: 45
+      sliceName: "RFM: Матрица среднего monetary"
+      uuid: 2f91934f-ef45-4d47-bf83-8a8021ef6699
+      width: 4
+    type: CHART
+  CHART-RFM-COUNT:
+    children: []
+    id: CHART-RFM-COUNT
+    meta:
+      chartId: 1010
+      height: 45
+      sliceName: "RFM: Матрица количества клиентов"
+      uuid: 7c459df0-e561-4fdb-a2a0-c29d81984c58
+      width: 4
+    type: CHART
+  CHART-RFM-AOV:
+    children: []
+    id: CHART-RFM-AOV
+    meta:
+      chartId: 1011
+      height: 45
+      sliceName: "RFM: Матрица среднего чека"
+      uuid: dcab528f-f8b2-46cf-a992-f484246f67ee
+      width: 4
+    type: CHART
+  ROW-ABC-1:
+    children:
+      - CHART-ABC-REV-PROFIT
+      - CHART-ABC-FREQ
+    id: ROW-ABC-1
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+  ROW-ABC-2:
+    children:
+      - CHART-XYZ-SALES
+      - CHART-XYZ-ORDERS
+    id: ROW-ABC-2
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+  ROW-ABC-3:
+    children:
+      - CHART-ABCXYZ-REV
+      - CHART-ABCXYZ-COUNT
+    id: ROW-ABC-3
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+  ROW-RFM-1:
+    children:
+      - CHART-RFM-SEGMENTS
+      - CHART-RFM-REVENUE
+    id: ROW-RFM-1
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+  ROW-RFM-2:
+    children:
+      - CHART-RFM-MONETARY
+      - CHART-RFM-COUNT
+      - CHART-RFM-AOV
+    id: ROW-RFM-2
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+version: 1.0.0

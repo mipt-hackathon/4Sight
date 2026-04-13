@@ -1,19 +1,14 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+
+from app.api.models import DashboardOverviewResponse
+from app.dependencies import get_retail_app_service
+from app.services.retail_app_service import RetailAppService
 
 router = APIRouter()
 
 
-@router.get("/overview")
-def dashboard_overview() -> dict:
-    # TODO: Read aggregate KPIs from mart/serving tables once those layers exist.
-    return {
-        "status": "stub",
-        "view": "dashboard_overview",
-        "sections": [
-            "sales_summary",
-            "customer_health",
-            "campaign_performance",
-            "logistics_snapshot",
-        ],
-        "todo": "Implement overview aggregation for BI-facing dashboard cards.",
-    }
+@router.get("/overview", response_model=DashboardOverviewResponse)
+def dashboard_overview(
+    service: RetailAppService = Depends(get_retail_app_service),
+) -> DashboardOverviewResponse:
+    return service.get_dashboard_overview()

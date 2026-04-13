@@ -1,0 +1,30 @@
+slice_name: "RFM: Доля выручки по сегментам"
+description: Распределение выручки по RFM-сегментам.
+certified_by: null
+certification_details: null
+viz_type: pie
+params:
+  datasource: 2__table
+  viz_type: pie
+  groupby:
+    - segment
+  metric: monetary_sum
+  adhoc_filters: []
+  row_limit: 100
+  sort_by_metric: true
+  color_scheme: supersetColors
+  show_labels_threshold: 5
+  show_legend: true
+  legendType: scroll
+  legendOrientation: top
+  label_type: key
+  number_format: SMART_NUMBER
+  show_labels: true
+  labels_outside: true
+  outerRadius: 70
+  innerRadius: 30
+  extra_form_data: {}
+cache_timeout: null
+uuid: 2fba9b9a-bfd0-4800-9614-1a305c0d5a16
+version: 1.0.0
+dataset_uuid: a6c06d30-a390-49ca-885a-0fe0f2e5d081

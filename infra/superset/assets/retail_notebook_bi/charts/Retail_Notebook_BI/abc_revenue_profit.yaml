@@ -1,0 +1,35 @@
+slice_name: "ABC: Выручка и прибыль"
+description: Выручка и прибыль по категориям ABC из notebook.
+certified_by: null
+certification_details: null
+viz_type: dist_bar
+params:
+  adhoc_filters: []
+  bar_stacked: false
+  bottom_margin: auto
+  color_scheme: supersetColors
+  columns: []
+  contribution: false
+  datasource: 1__table
+  groupby:
+    - abc_category
+  metrics:
+    - total_revenue_sum
+    - total_profit_sum
+  order_bars: false
+  queryFields:
+    columns: groupby
+    groupby: groupby
+    metrics: metrics
+  row_limit: 10000
+  show_bar_value: false
+  show_controls: true
+  show_legend: true
+  viz_type: dist_bar
+  x_axis_label: ABC категория
+  x_ticks_layout: flat
+  y_axis_format: SMART_NUMBER
+cache_timeout: null
+uuid: 9e9c03ea-b0e8-46b1-9a33-7d28603df3d0
+version: 1.0.0
+dataset_uuid: 12e7b948-21e7-4cb2-8d1a-8b078f4d9ca9

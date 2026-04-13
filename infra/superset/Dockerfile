@@ -5,6 +5,7 @@ RUN pip install --no-cache-dir psycopg2-binary
 
 COPY infra/superset/superset_config.py /app/pythonpath/superset_config.py
 COPY infra/superset/init.sh /app/docker/init.sh
+COPY infra/superset/assets /app/docker/assets
 RUN chmod +x /app/docker/init.sh
 
 USER superset

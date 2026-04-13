@@ -1,84 +1,45 @@
 @startuml
 left to right direction
 hide methods
-' hide stereotypes
 skinparam classAttributeIconSize 0
 skinparam linetype ortho
 
-title Mart Layer ERD
+title Mart Layer Overview
 
 entity "mart.sales_daily" as sales_daily {
   * sales_date : DATE
   --
   orders_count : BIGINT
   customers_count : BIGINT
-  order_items_count : BIGINT
-  gross_revenue : NUMERIC(14,2)
-  avg_item_price : NUMERIC(14,2)
-  avg_order_value : NUMERIC(14,2)
-  completed_orders_count : BIGINT
-  shipped_orders_count : BIGINT
-  cancelled_orders_count : BIGINT
-  returned_orders_count : BIGINT
+  gross_revenue : NUMERIC
+  avg_order_value : NUMERIC
 }
-
-note top of sales_daily
-  Логическая схема витринного слоя.
-  В витринном слое внешние ключи
-  сейчас не заданы как ограничения.
-end note
 
 entity "mart.behavior_metrics" as behavior_metrics {
   * user_id : BIGINT
   --
-  first_event_at : TIMESTAMPTZ
-  last_event_at : TIMESTAMPTZ
   event_count : BIGINT
   session_count : BIGINT
-  home_events_count : BIGINT
-  department_events_count : BIGINT
-  product_events_count : BIGINT
-  cart_events_count : BIGINT
-  purchase_events_count : BIGINT
-  cancel_events_count : BIGINT
   days_since_last_event : INTEGER
 }
 
 entity "mart.customer_360" as customer_360 {
   * user_id : BIGINT
   --
-  gender : TEXT
-  first_name : TEXT
-  last_name : TEXT
-  email : TEXT
-  age : INTEGER
-  state : TEXT
-  city : TEXT
-  country : TEXT
-  traffic_source : TEXT
-  is_loyal : BOOLEAN
-  first_order_at : TIMESTAMPTZ
-  last_order_at : TIMESTAMPTZ
   orders_count : BIGINT
-  completed_orders_count : BIGINT
-  shipped_orders_count : BIGINT
-  cancelled_orders_count : BIGINT
-  returned_orders_count : BIGINT
-  order_items_count : BIGINT
-  total_revenue : NUMERIC(14,2)
-  avg_order_value : NUMERIC(14,2)
+  total_revenue : NUMERIC
+  avg_order_value : NUMERIC
   days_since_last_order : INTEGER
-  first_event_at : TIMESTAMPTZ
-  last_event_at : TIMESTAMPTZ
-  event_count : BIGINT
-  session_count : BIGINT
-  home_events_count : BIGINT
-  department_events_count : BIGINT
-  product_events_count : BIGINT
-  cart_events_count : BIGINT
-  purchase_events_count : BIGINT
-  cancel_events_count : BIGINT
-  days_since_last_event : INTEGER
+}
+
+entity "mart.abc_xyz" as abc_xyz {
+  * user_id : BIGINT
+  --
+  abc_category : TEXT
+  xyz_sales_category : TEXT
+  xyz_orders_category : TEXT
+  total_revenue : NUMERIC
+  recommended_strategy : TEXT
 }
 
 entity "mart.rfm" as rfm {
@@ -86,30 +47,95 @@ entity "mart.rfm" as rfm {
   --
   recency_days : INTEGER
   frequency_orders : BIGINT
-  monetary_value : NUMERIC(14,2)
-  recency_score : INTEGER
-  frequency_score : INTEGER
-  monetary_score : INTEGER
-  rfm_score : TEXT
+  monetary_value : NUMERIC
   rfm_segment : TEXT
 }
 
-customer_360 ||--|| behavior_metrics
-customer_360 ||--|| rfm
+entity "mart.logistics_metrics" as logistics_metrics {
+  * user_id : BIGINT
+  --
+  avg_delivery_days : NUMERIC
+  return_rate : NUMERIC
+  problem_score : NUMERIC
+  recommendation : TEXT
+}
 
-note bottom of sales_daily
-  sales_daily — независимая
-  агрегированная витрина по дате.
-end note
+entity "mart.cohorts" as cohorts {
+  * cohort_month : DATE
+  * cohort_period_number : INTEGER
+  --
+  cohort_size : BIGINT
+  active_customers : BIGINT
+  retention_rate : NUMERIC
+  revenue : NUMERIC
+}
 
-note bottom of customer_360
-  customer_360 использует метрики
-  поведения и агрегаты по заказам.
-end note
+entity "mart.product_xyz" as product_xyz {
+  * product_id : BIGINT
+  --
+  product_name : TEXT
+  category : TEXT
+  total_revenue : NUMERIC
+  cv_sales : NUMERIC
+  xyz_category : TEXT
+}
 
-note bottom of rfm
-  rfm полностью рассчитывается
-  на основе customer_360.
+entity "mart.region_abc" as region_abc {
+  * state : TEXT
+  --
+  total_revenue : NUMERIC
+  total_profit : NUMERIC
+  customers_count : BIGINT
+  region_category : TEXT
+}
+
+entity "mart.customer_abc_monthly" as customer_abc_monthly {
+  * year_month : DATE
+  --
+  a_customers : BIGINT
+  b_customers : BIGINT
+  c_customers : BIGINT
+  total_customers : BIGINT
+}
+
+entity "mart.customer_category_migration" as customer_category_migration {
+  * first_category : TEXT
+  * last_category : TEXT
+  --
+  customers_count : BIGINT
+  migration_percent : NUMERIC
+  category_stability_percent : NUMERIC
+}
+
+entity "mart.category_abc" as category_abc {
+  * category : TEXT
+  --
+  total_revenue : NUMERIC
+  total_profit : NUMERIC
+  return_rate : NUMERIC
+  abc_category : TEXT
+}
+
+entity "mart.brand_abc" as brand_abc {
+  * brand : TEXT
+  --
+  total_revenue : NUMERIC
+  total_profit : NUMERIC
+  return_rate : NUMERIC
+  abc_category : TEXT
+}
+
+behavior_metrics -- customer_360
+abc_xyz -- customer_360
+rfm -- customer_360
+logistics_metrics -- customer_360
+product_xyz -- category_abc
+brand_abc -- category_abc
+customer_abc_monthly -- customer_category_migration
+
+note top of sales_daily
+  Текущий mart-слой состоит из
+  13 аналитических витрин.
 end note
 
 @enduml

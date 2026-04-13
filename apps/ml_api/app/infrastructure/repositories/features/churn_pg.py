@@ -29,7 +29,9 @@ class ChurnFeatureRepositoryImpl:
     def __init__(self, engine: Engine) -> None:
         self._engine = engine
 
-    def get_features_for_user(self, user_id: str, as_of_date: date | None = None) -> ChurnFeatures | None:
+    def get_features_for_user(
+        self, user_id: str, as_of_date: date | None = None
+    ) -> ChurnFeatures | None:
         if as_of_date is not None:
             logger.debug("feature_source=churn as_of_date=%s user_id=%s", as_of_date, user_id)
 
@@ -40,7 +42,7 @@ class ChurnFeatureRepositoryImpl:
                     logger.debug("feature_source=feature.churn user_id=%s", user_id)
                     return ChurnFeatures(**dict(row))
             except ProgrammingError:
-                pass  # feature.churn table not yet populated
+                conn.rollback()
 
             row = conn.execute(_FALLBACK_QUERY, {"uid": user_id}).mappings().one_or_none()
             if row is None:

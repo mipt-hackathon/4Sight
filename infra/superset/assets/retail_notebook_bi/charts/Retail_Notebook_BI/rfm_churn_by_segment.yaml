@@ -1,0 +1,34 @@
+slice_name: "RFM: Уровень оттока по сегментам"
+description: Уровень оттока по RFM-сегментам из notebook.
+certified_by: null
+certification_details: null
+viz_type: dist_bar
+params:
+  adhoc_filters: []
+  bar_stacked: false
+  bottom_margin: auto
+  color_scheme: supersetColors
+  columns: []
+  contribution: false
+  datasource: 6__table
+  groupby:
+    - segment
+  metrics:
+    - churn_rate_pct_avg
+  order_bars: true
+  queryFields:
+    columns: groupby
+    groupby: groupby
+    metrics: metrics
+  row_limit: 100
+  show_bar_value: false
+  show_controls: true
+  show_legend: false
+  viz_type: dist_bar
+  x_axis_label: RFM сегмент
+  x_ticks_layout: flat
+  y_axis_format: SMART_NUMBER
+cache_timeout: null
+uuid: ac386bc1-24f1-4a35-b883-bb3547b14fe9
+version: 1.0.0
+dataset_uuid: 44d514d0-b7f8-45cc-b070-f440ebe2112d
