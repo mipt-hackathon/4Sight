@@ -3,10 +3,10 @@
 ## Отчеты для сдачи черновика решения
 - [ML API](./docs/reports//ml_api_report_draft.md)
 
-
+## Архитектура решения
 ```mermaid
 
-## Архитектура решения
+
 flowchart LR
     data_csv["data.csv"] --> etl["jobs/ etl
     parsers / validators / extract / transform / load to db"]
