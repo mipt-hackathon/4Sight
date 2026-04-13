@@ -1,0 +1,34 @@
+slice_name: "ABC-XYZ: Распределение объектов по XYZ категориям"
+description: Корректное распределение объектов по X/Y/Z категориям из обновленного notebook.
+certified_by: null
+certification_details: null
+viz_type: dist_bar
+params:
+  adhoc_filters: []
+  bar_stacked: false
+  bottom_margin: auto
+  color_scheme: supersetColors
+  columns: []
+  contribution: false
+  datasource: 1__table
+  groupby:
+    - xyz_category
+  metrics:
+    - count
+  order_bars: false
+  queryFields:
+    columns: groupby
+    groupby: groupby
+    metrics: metrics
+  row_limit: 1000
+  show_bar_value: true
+  show_controls: true
+  show_legend: false
+  viz_type: dist_bar
+  x_axis_label: XYZ категория
+  x_ticks_layout: flat
+  y_axis_format: SMART_NUMBER
+cache_timeout: null
+uuid: 99423618-6fda-419b-b72b-57e04b233b1f
+version: 1.0.0
+dataset_uuid: 12e7b948-21e7-4cb2-8d1a-8b078f4d9ca9

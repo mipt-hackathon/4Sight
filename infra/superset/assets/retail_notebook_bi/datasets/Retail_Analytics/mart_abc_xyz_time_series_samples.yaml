@@ -1,6 +1,6 @@
-table_name: abc_xyz
-main_dttm_col: null
-description: Notebook-backed ABC/XYZ customer mart.
+table_name: abc_xyz_time_series_samples
+main_dttm_col: time_period
+description: Sample monthly time series used in the corrected notebook ABC/XYZ plot.
 default_endpoint: null
 offset: 0
 cache_timeout: null
@@ -15,42 +15,46 @@ fetch_values_predicate: null
 extra: null
 normalize_columns: false
 always_filter_main_dttm: false
-uuid: 12e7b948-21e7-4cb2-8d1a-8b078f4d9ca9
+uuid: 4c884fd7-a495-495f-9595-609633407734
 metrics:
-  - metric_name: count
-    verbose_name: COUNT(*)
+  - metric_name: x_period_value_sum
+    verbose_name: X sample
     metric_type: null
-    expression: COUNT(*)
+    expression: SUM(x_period_value)
     description: null
     d3format: null
     extra: null
     warning_text: null
-  - metric_name: total_revenue_sum
-    verbose_name: SUM(total_revenue)
+  - metric_name: y_period_value_sum
+    verbose_name: Y sample
     metric_type: null
-    expression: SUM(total_revenue)
+    expression: SUM(y_period_value)
     description: null
     d3format: null
     extra: null
     warning_text: null
-  - metric_name: total_profit_sum
-    verbose_name: SUM(total_profit)
+  - metric_name: z_period_value_sum
+    verbose_name: Z sample
     metric_type: null
-    expression: SUM(total_profit)
-    description: null
-    d3format: null
-    extra: null
-    warning_text: null
-  - metric_name: churn_rate_pct_avg
-    verbose_name: AVG(churn) * 100
-    metric_type: null
-    expression: AVG(churn) * 100.0
+    expression: SUM(z_period_value)
     description: null
     d3format: null
     extra: null
     warning_text: null
 columns:
-  - column_name: user_id
+  - column_name: time_period
+    verbose_name: null
+    is_dttm: true
+    is_active: true
+    type: DATE
+    advanced_data_type: null
+    groupby: true
+    filterable: true
+    expression: null
+    description: null
+    python_date_format: null
+    extra: null
+  - column_name: x_sample_user_id
     verbose_name: null
     is_dttm: false
     is_active: true
@@ -62,19 +66,7 @@ columns:
     description: null
     python_date_format: null
     extra: null
-  - column_name: abc_category
-    verbose_name: null
-    is_dttm: false
-    is_active: true
-    type: TEXT
-    advanced_data_type: null
-    groupby: true
-    filterable: true
-    expression: null
-    description: null
-    python_date_format: null
-    extra: null
-  - column_name: total_revenue
+  - column_name: x_cv_percent
     verbose_name: null
     is_dttm: false
     is_active: true
@@ -86,7 +78,7 @@ columns:
     description: null
     python_date_format: null
     extra: null
-  - column_name: total_profit
+  - column_name: x_period_value
     verbose_name: null
     is_dttm: false
     is_active: true
@@ -98,43 +90,7 @@ columns:
     description: null
     python_date_format: null
     extra: null
-  - column_name: frequency_category
-    verbose_name: null
-    is_dttm: false
-    is_active: true
-    type: TEXT
-    advanced_data_type: null
-    groupby: true
-    filterable: true
-    expression: null
-    description: null
-    python_date_format: null
-    extra: null
-  - column_name: xyz_sales_category
-    verbose_name: null
-    is_dttm: false
-    is_active: true
-    type: TEXT
-    advanced_data_type: null
-    groupby: true
-    filterable: true
-    expression: null
-    description: null
-    python_date_format: null
-    extra: null
-  - column_name: xyz_orders_category
-    verbose_name: null
-    is_dttm: false
-    is_active: true
-    type: TEXT
-    advanced_data_type: null
-    groupby: true
-    filterable: true
-    expression: null
-    description: null
-    python_date_format: null
-    extra: null
-  - column_name: month_count
+  - column_name: y_sample_user_id
     verbose_name: null
     is_dttm: false
     is_active: true
@@ -146,19 +102,7 @@ columns:
     description: null
     python_date_format: null
     extra: null
-  - column_name: churn
-    verbose_name: null
-    is_dttm: false
-    is_active: true
-    type: INTEGER
-    advanced_data_type: null
-    groupby: true
-    filterable: true
-    expression: null
-    description: null
-    python_date_format: null
-    extra: null
-  - column_name: mean_value
+  - column_name: y_cv_percent
     verbose_name: null
     is_dttm: false
     is_active: true
@@ -170,7 +114,7 @@ columns:
     description: null
     python_date_format: null
     extra: null
-  - column_name: std_value
+  - column_name: y_period_value
     verbose_name: null
     is_dttm: false
     is_active: true
@@ -182,7 +126,7 @@ columns:
     description: null
     python_date_format: null
     extra: null
-  - column_name: periods_count
+  - column_name: z_sample_user_id
     verbose_name: null
     is_dttm: false
     is_active: true
@@ -194,7 +138,7 @@ columns:
     description: null
     python_date_format: null
     extra: null
-  - column_name: cv_percent
+  - column_name: z_cv_percent
     verbose_name: null
     is_dttm: false
     is_active: true
@@ -206,23 +150,11 @@ columns:
     description: null
     python_date_format: null
     extra: null
-  - column_name: xyz_category
+  - column_name: z_period_value
     verbose_name: null
     is_dttm: false
     is_active: true
-    type: TEXT
-    advanced_data_type: null
-    groupby: true
-    filterable: true
-    expression: null
-    description: null
-    python_date_format: null
-    extra: null
-  - column_name: xyz_description
-    verbose_name: null
-    is_dttm: false
-    is_active: true
-    type: TEXT
+    type: NUMERIC(14, 2)
     advanced_data_type: null
     groupby: true
     filterable: true

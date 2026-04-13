@@ -1,0 +1,36 @@
+slice_name: "ABC-XYZ: Примеры временных рядов"
+description: Примеры месячных рядов для X/Y/Z из обновленного notebook.
+certified_by: null
+certification_details: null
+viz_type: dist_bar
+params:
+  adhoc_filters: []
+  bar_stacked: false
+  bottom_margin: auto
+  color_scheme: supersetColors
+  columns: []
+  contribution: false
+  datasource: 12__table
+  groupby:
+    - time_period
+  metrics:
+    - x_period_value_sum
+    - y_period_value_sum
+    - z_period_value_sum
+  order_bars: false
+  queryFields:
+    columns: groupby
+    groupby: groupby
+    metrics: metrics
+  row_limit: 1000
+  show_bar_value: false
+  show_controls: true
+  show_legend: true
+  viz_type: dist_bar
+  x_axis_label: Месяц
+  x_ticks_layout: staggered
+  y_axis_format: SMART_NUMBER
+cache_timeout: null
+uuid: ae890463-b840-46f4-91b3-6356b7c0b029
+version: 1.0.0
+dataset_uuid: 4c884fd7-a495-495f-9595-609633407734

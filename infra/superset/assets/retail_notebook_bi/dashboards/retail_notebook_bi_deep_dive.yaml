@@ -24,6 +24,8 @@ position:
       - ROW-DEEP-7
       - ROW-DEEP-8
       - ROW-DEEP-9
+      - ROW-DEEP-10
+      - ROW-DEEP-11
     id: GRID_ID
     parents:
       - ROOT_ID
@@ -213,6 +215,46 @@ position:
       uuid: 901650d5-7a45-4a09-82f4-172b903ff22f
       width: 6
     type: CHART
+  CHART-ABCXYZ-CORRECTED-MATRIX:
+    children: []
+    id: CHART-ABCXYZ-CORRECTED-MATRIX
+    meta:
+      chartId: 1030
+      height: 45
+      sliceName: "ABC-XYZ: Матрица суммы показателя"
+      uuid: 3cc5916b-0fdf-45ff-afb8-c6d5ca814930
+      width: 6
+    type: CHART
+  CHART-ABCXYZ-OBJECTS:
+    children: []
+    id: CHART-ABCXYZ-OBJECTS
+    meta:
+      chartId: 1031
+      height: 45
+      sliceName: "ABC-XYZ: Распределение объектов по XYZ категориям"
+      uuid: 99423618-6fda-419b-b72b-57e04b233b1f
+      width: 6
+    type: CHART
+  CHART-ABCXYZ-CV:
+    children: []
+    id: CHART-ABCXYZ-CV
+    meta:
+      chartId: 1032
+      height: 45
+      sliceName: "ABC-XYZ: Распределение коэффициента вариации"
+      uuid: 14cae5b4-57b3-4992-803c-691c19b2615e
+      width: 6
+    type: CHART
+  CHART-ABCXYZ-TIMESERIES:
+    children: []
+    id: CHART-ABCXYZ-TIMESERIES
+    meta:
+      chartId: 1033
+      height: 45
+      sliceName: "ABC-XYZ: Примеры временных рядов"
+      uuid: ae890463-b840-46f4-91b3-6356b7c0b029
+      width: 6
+    type: CHART
   ROW-DEEP-1:
     children:
       - CHART-CUSTOMER-ABC-SHARE
@@ -282,6 +324,22 @@ position:
       - CHART-BRAND-RANKING
       - CHART-BRAND-SHARE
     id: ROW-DEEP-9
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+  ROW-DEEP-10:
+    children:
+      - CHART-ABCXYZ-CORRECTED-MATRIX
+      - CHART-ABCXYZ-OBJECTS
+    id: ROW-DEEP-10
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+  ROW-DEEP-11:
+    children:
+      - CHART-ABCXYZ-CV
+      - CHART-ABCXYZ-TIMESERIES
+    id: ROW-DEEP-11
     meta:
       background: BACKGROUND_TRANSPARENT
     type: ROW

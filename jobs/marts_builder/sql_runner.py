@@ -13,6 +13,8 @@ MART_REFRESH_ORDER = (
     "mart_behavior_metrics.sql",
     "mart_customer_360.sql",
     "mart_abc_xyz.sql",
+    "mart_abc_xyz_cv_distribution.sql",
+    "mart_abc_xyz_time_series_samples.sql",
     "mart_rfm.sql",
     "mart_rfm_churn_by_segment.sql",
     "mart_logistics_metrics.sql",

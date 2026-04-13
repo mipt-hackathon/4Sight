@@ -131,13 +131,13 @@ order_timing AS (
         SELECT
             user_id,
             EXTRACT(
-                DAY FROM (
+                EPOCH FROM (
                     created_at - LAG(created_at) OVER (
                         PARTITION BY user_id
                         ORDER BY created_at, order_item_id
                     )
                 )
-            ) AS day_gap
+            ) / 86400.0 AS day_gap
         FROM analysis_source
     ) AS timed_orders
     GROUP BY user_id
@@ -194,7 +194,7 @@ purchase_freq_enriched AS (
     LEFT JOIN trend_by_user
         ON trend_by_user.user_id = purchase_freq.user_id
 ),
-user_monthly_sales AS (
+legacy_user_monthly_sales AS (
     SELECT
         user_id,
         date_trunc('month', created_at)::date AS year_month,
@@ -204,64 +204,123 @@ user_monthly_sales AS (
     FROM analysis_source
     GROUP BY user_id, date_trunc('month', created_at)::date
 ),
-active_users AS (
+legacy_active_users AS (
     SELECT
         user_id,
         COUNT(*) AS month_count
-    FROM user_monthly_sales
+    FROM legacy_user_monthly_sales
     GROUP BY user_id
     HAVING COUNT(*) >= 3
 ),
-xyz_stats AS (
+legacy_xyz_stats AS (
     SELECT
-        user_monthly_sales.user_id,
-        active_users.month_count,
-        ROUND(AVG(user_monthly_sales.sale_price), 2) AS avg_sales,
-        ROUND(COALESCE(STDDEV_SAMP(user_monthly_sales.sale_price), 0)::NUMERIC, 2) AS std_sales,
-        ROUND(AVG(user_monthly_sales.order_count::NUMERIC), 2) AS avg_orders,
-        ROUND(COALESCE(STDDEV_SAMP(user_monthly_sales.order_count::NUMERIC), 0)::NUMERIC, 2) AS std_orders,
-        ROUND(AVG(user_monthly_sales.profit), 2) AS avg_profit,
-        ROUND(COALESCE(STDDEV_SAMP(user_monthly_sales.profit), 0)::NUMERIC, 2) AS std_profit,
+        legacy_user_monthly_sales.user_id,
+        legacy_active_users.month_count,
+        ROUND(AVG(legacy_user_monthly_sales.sale_price), 2) AS avg_sales,
+        ROUND(COALESCE(STDDEV_SAMP(legacy_user_monthly_sales.sale_price), 0)::NUMERIC, 2) AS std_sales,
+        ROUND(AVG(legacy_user_monthly_sales.order_count::NUMERIC), 2) AS avg_orders,
+        ROUND(
+            COALESCE(STDDEV_SAMP(legacy_user_monthly_sales.order_count::NUMERIC), 0)::NUMERIC,
+            2
+        ) AS std_orders,
+        ROUND(AVG(legacy_user_monthly_sales.profit), 2) AS avg_profit,
+        ROUND(COALESCE(STDDEV_SAMP(legacy_user_monthly_sales.profit), 0)::NUMERIC, 2) AS std_profit,
         COALESCE(
-            COALESCE(STDDEV_SAMP(user_monthly_sales.sale_price), 0)
-            / NULLIF(AVG(user_monthly_sales.sale_price), 0),
+            COALESCE(STDDEV_SAMP(legacy_user_monthly_sales.sale_price), 0)
+            / NULLIF(AVG(legacy_user_monthly_sales.sale_price), 0),
             0
         ) AS cv_sales,
         COALESCE(
-            COALESCE(STDDEV_SAMP(user_monthly_sales.order_count::NUMERIC), 0)
-            / NULLIF(AVG(user_monthly_sales.order_count::NUMERIC), 0),
+            COALESCE(STDDEV_SAMP(legacy_user_monthly_sales.order_count::NUMERIC), 0)
+            / NULLIF(AVG(legacy_user_monthly_sales.order_count::NUMERIC), 0),
             0
         ) AS cv_orders,
         CASE
             WHEN COALESCE(
-                COALESCE(STDDEV_SAMP(user_monthly_sales.sale_price), 0)
-                / NULLIF(AVG(user_monthly_sales.sale_price), 0),
+                COALESCE(STDDEV_SAMP(legacy_user_monthly_sales.sale_price), 0)
+                / NULLIF(AVG(legacy_user_monthly_sales.sale_price), 0),
                 0
             ) < 0.3 THEN 'X (стабильные)'
             WHEN COALESCE(
-                COALESCE(STDDEV_SAMP(user_monthly_sales.sale_price), 0)
-                / NULLIF(AVG(user_monthly_sales.sale_price), 0),
+                COALESCE(STDDEV_SAMP(legacy_user_monthly_sales.sale_price), 0)
+                / NULLIF(AVG(legacy_user_monthly_sales.sale_price), 0),
                 0
             ) < 0.7 THEN 'Y (средние)'
             ELSE 'Z (нестабильные)'
         END AS xyz_sales_category,
         CASE
             WHEN COALESCE(
-                COALESCE(STDDEV_SAMP(user_monthly_sales.order_count::NUMERIC), 0)
-                / NULLIF(AVG(user_monthly_sales.order_count::NUMERIC), 0),
+                COALESCE(STDDEV_SAMP(legacy_user_monthly_sales.order_count::NUMERIC), 0)
+                / NULLIF(AVG(legacy_user_monthly_sales.order_count::NUMERIC), 0),
                 0
             ) < 0.3 THEN 'X (стабильные)'
             WHEN COALESCE(
-                COALESCE(STDDEV_SAMP(user_monthly_sales.order_count::NUMERIC), 0)
-                / NULLIF(AVG(user_monthly_sales.order_count::NUMERIC), 0),
+                COALESCE(STDDEV_SAMP(legacy_user_monthly_sales.order_count::NUMERIC), 0)
+                / NULLIF(AVG(legacy_user_monthly_sales.order_count::NUMERIC), 0),
                 0
             ) < 0.7 THEN 'Y (средние)'
             ELSE 'Z (нестабильные)'
         END AS xyz_orders_category
-    FROM user_monthly_sales
-    JOIN active_users
-        ON active_users.user_id = user_monthly_sales.user_id
-    GROUP BY user_monthly_sales.user_id, active_users.month_count
+    FROM legacy_user_monthly_sales
+    JOIN legacy_active_users
+        ON legacy_active_users.user_id = legacy_user_monthly_sales.user_id
+    GROUP BY legacy_user_monthly_sales.user_id, legacy_active_users.month_count
+),
+correct_time_series AS (
+    SELECT
+        user_id,
+        date_trunc('month', created_at)::date AS time_period,
+        SUM(sale_price)::NUMERIC(14, 2) AS period_value
+    FROM analysis_source
+    GROUP BY user_id, date_trunc('month', created_at)::date
+),
+correct_xyz_metrics AS (
+    SELECT
+        user_id,
+        ROUND(AVG(period_value), 2) AS mean_value,
+        ROUND(COALESCE(STDDEV_SAMP(period_value), 0)::NUMERIC, 2) AS std_value,
+        COUNT(*) AS periods_count,
+        ROUND(
+            (
+                COALESCE(
+                    COALESCE(STDDEV_SAMP(period_value), 0) / NULLIF(AVG(period_value), 0),
+                    0
+                ) * 100
+            )::NUMERIC,
+            2
+        ) AS cv_percent,
+        CASE
+            WHEN (
+                COALESCE(
+                    COALESCE(STDDEV_SAMP(period_value), 0) / NULLIF(AVG(period_value), 0),
+                    0
+                ) * 100
+            ) <= 10 THEN 'X'
+            WHEN (
+                COALESCE(
+                    COALESCE(STDDEV_SAMP(period_value), 0) / NULLIF(AVG(period_value), 0),
+                    0
+                ) * 100
+            ) <= 25 THEN 'Y'
+            ELSE 'Z'
+        END AS xyz_category,
+        CASE
+            WHEN (
+                COALESCE(
+                    COALESCE(STDDEV_SAMP(period_value), 0) / NULLIF(AVG(period_value), 0),
+                    0
+                ) * 100
+            ) <= 10 THEN 'Стабильное потребление (CV ≤ 10%%)'
+            WHEN (
+                COALESCE(
+                    COALESCE(STDDEV_SAMP(period_value), 0) / NULLIF(AVG(period_value), 0),
+                    0
+                ) * 100
+            ) <= 25 THEN 'Регулярное потребление (10%% < CV ≤ 25%%)'
+            ELSE 'Хаотическое потребление (CV > 25%%)'
+        END AS xyz_description
+    FROM correct_time_series
+    GROUP BY user_id
 ),
 combined AS (
     SELECT
@@ -285,20 +344,28 @@ combined AS (
         purchase_freq_enriched.abc_category,
         purchase_freq_enriched.abc_cumulative_revenue,
         purchase_freq_enriched.abc_cumulative_percent,
-        COALESCE(xyz_stats.month_count, 0) AS month_count,
-        xyz_stats.avg_sales,
-        xyz_stats.std_sales,
-        xyz_stats.avg_orders,
-        xyz_stats.std_orders,
-        xyz_stats.avg_profit,
-        xyz_stats.std_profit,
-        ROUND(COALESCE(xyz_stats.cv_sales, 0)::NUMERIC, 4) AS cv_sales,
-        ROUND(COALESCE(xyz_stats.cv_orders, 0)::NUMERIC, 4) AS cv_orders,
-        COALESCE(xyz_stats.xyz_sales_category, 'Z (нестабильные)') AS xyz_sales_category,
-        xyz_stats.xyz_orders_category
+        COALESCE(legacy_xyz_stats.month_count, 0) AS month_count,
+        legacy_xyz_stats.avg_sales,
+        legacy_xyz_stats.std_sales,
+        legacy_xyz_stats.avg_orders,
+        legacy_xyz_stats.std_orders,
+        legacy_xyz_stats.avg_profit,
+        legacy_xyz_stats.std_profit,
+        ROUND(COALESCE(legacy_xyz_stats.cv_sales, 0)::NUMERIC, 4) AS cv_sales,
+        ROUND(COALESCE(legacy_xyz_stats.cv_orders, 0)::NUMERIC, 4) AS cv_orders,
+        COALESCE(legacy_xyz_stats.xyz_sales_category, 'Z (нестабильные)') AS xyz_sales_category,
+        legacy_xyz_stats.xyz_orders_category,
+        correct_xyz_metrics.mean_value,
+        correct_xyz_metrics.std_value,
+        correct_xyz_metrics.periods_count,
+        correct_xyz_metrics.cv_percent,
+        correct_xyz_metrics.xyz_category,
+        correct_xyz_metrics.xyz_description
     FROM purchase_freq_enriched
-    LEFT JOIN xyz_stats
-        ON xyz_stats.user_id = purchase_freq_enriched.user_id
+    LEFT JOIN legacy_xyz_stats
+        ON legacy_xyz_stats.user_id = purchase_freq_enriched.user_id
+    LEFT JOIN correct_xyz_metrics
+        ON correct_xyz_metrics.user_id = purchase_freq_enriched.user_id
 )
 SELECT
     user_id,
@@ -332,6 +399,12 @@ SELECT
     cv_orders,
     xyz_sales_category,
     xyz_orders_category,
+    mean_value,
+    std_value,
+    periods_count,
+    cv_percent,
+    xyz_category,
+    xyz_description,
     CONCAT(abc_category, '|', xyz_sales_category) AS strategy_key,
     CASE
         WHEN abc_category = 'A' AND xyz_sales_category = 'X (стабильные)' THEN
