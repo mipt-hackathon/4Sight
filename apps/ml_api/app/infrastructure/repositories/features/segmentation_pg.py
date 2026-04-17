@@ -34,7 +34,7 @@ class SegmentationFeatureRepositoryImpl:
                     logger.debug("feature_source=feature.segmentation user_id=%s", user_id)
                     return SegmentationFeatures(**dict(row))
             except ProgrammingError:
-                pass
+                conn.rollback()
 
             row = conn.execute(_FALLBACK_QUERY, {"uid": user_id}).mappings().one_or_none()
             if row is None:

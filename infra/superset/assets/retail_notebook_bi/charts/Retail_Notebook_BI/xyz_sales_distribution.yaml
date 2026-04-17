@@ -1,0 +1,37 @@
+slice_name: "XYZ: Распределение по сумме покупок"
+description: Распределение пользователей по XYZ-категориям для суммы покупок.
+certified_by: null
+certification_details: null
+viz_type: pie
+params:
+  datasource: 1__table
+  viz_type: pie
+  groupby:
+    - xyz_sales_category
+  metric: count
+  adhoc_filters:
+    - clause: WHERE
+      comparator: 0
+      expressionType: SIMPLE
+      operator: ">"
+      operatorId: GREATER_THAN
+      sqlExpression: null
+      subject: month_count
+  row_limit: 100
+  sort_by_metric: true
+  color_scheme: supersetColors
+  show_labels_threshold: 5
+  show_legend: true
+  legendType: scroll
+  legendOrientation: top
+  label_type: key
+  number_format: SMART_NUMBER
+  show_labels: true
+  labels_outside: true
+  outerRadius: 70
+  innerRadius: 30
+  extra_form_data: {}
+cache_timeout: null
+uuid: 6fb1c262-16de-4c56-b7a1-473d0104cb21
+version: 1.0.0
+dataset_uuid: 12e7b948-21e7-4cb2-8d1a-8b078f4d9ca9

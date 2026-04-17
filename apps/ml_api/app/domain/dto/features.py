@@ -6,7 +6,7 @@ from pydantic import BaseModel
 class ChurnFeatures(BaseModel):
     model_config = {"extra": "allow"}
 
-    user_id: str
+    user_id: int | str
     days_since_last_order: float | None = None
     orders_count: float | None = None
     total_revenue: float | None = None
@@ -24,7 +24,7 @@ class ChurnFeatures(BaseModel):
 class RecommendationsUserFeatures(BaseModel):
     model_config = {"extra": "allow"}
 
-    user_id: str
+    user_id: int | str
     orders_count: float | None = None
     total_revenue: float | None = None
     days_since_last_order: float | None = None
@@ -41,7 +41,7 @@ class ForecastHistory(BaseModel):
 class SegmentationFeatures(BaseModel):
     model_config = {"extra": "allow"}
 
-    user_id: str
+    user_id: int | str
     rfm_score: float | None = None
     rfm_segment: str | None = None
     recency_score: float | None = None

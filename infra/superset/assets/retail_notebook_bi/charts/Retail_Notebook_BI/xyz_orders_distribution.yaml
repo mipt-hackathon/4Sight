@@ -1,0 +1,37 @@
+slice_name: "XYZ: Распределение по количеству заказов"
+description: Распределение пользователей по XYZ-категориям для количества заказов.
+certified_by: null
+certification_details: null
+viz_type: pie
+params:
+  datasource: 1__table
+  viz_type: pie
+  groupby:
+    - xyz_orders_category
+  metric: count
+  adhoc_filters:
+    - clause: WHERE
+      comparator: 0
+      expressionType: SIMPLE
+      operator: ">"
+      operatorId: GREATER_THAN
+      sqlExpression: null
+      subject: month_count
+  row_limit: 100
+  sort_by_metric: true
+  color_scheme: supersetColors
+  show_labels_threshold: 5
+  show_legend: true
+  legendType: scroll
+  legendOrientation: top
+  label_type: key
+  number_format: SMART_NUMBER
+  show_labels: true
+  labels_outside: true
+  outerRadius: 70
+  innerRadius: 30
+  extra_form_data: {}
+cache_timeout: null
+uuid: 09a29cb9-9555-4cef-9c4a-5b2122ef59dd
+version: 1.0.0
+dataset_uuid: 12e7b948-21e7-4cb2-8d1a-8b078f4d9ca9

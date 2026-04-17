@@ -1,0 +1,105 @@
+table_name: customer_category_migration
+main_dttm_col: null
+description: Notebook-backed customer category migration matrix.
+default_endpoint: null
+offset: 0
+cache_timeout: null
+catalog: retail_analytics
+schema: mart
+database_uuid: 73e7590d-077a-4c05-a28b-f13d9a3324d1
+sql: null
+params: null
+template_params: null
+filter_select_enabled: true
+fetch_values_predicate: null
+extra: null
+normalize_columns: false
+always_filter_main_dttm: false
+uuid: 60d26ecb-35a0-43db-be3a-7af1d422d3e4
+metrics:
+  - metric_name: customers_count_sum
+    verbose_name: SUM(customers_count)
+    metric_type: null
+    expression: SUM(customers_count)
+    description: null
+    d3format: null
+    extra: null
+    warning_text: null
+  - metric_name: migration_percent_avg
+    verbose_name: AVG(migration_percent)
+    metric_type: null
+    expression: AVG(migration_percent)
+    description: null
+    d3format: null
+    extra: null
+    warning_text: null
+  - metric_name: category_stability_percent_avg
+    verbose_name: AVG(category_stability_percent)
+    metric_type: null
+    expression: AVG(category_stability_percent)
+    description: null
+    d3format: null
+    extra: null
+    warning_text: null
+columns:
+  - column_name: first_category
+    verbose_name: null
+    is_dttm: false
+    is_active: true
+    type: TEXT
+    advanced_data_type: null
+    groupby: true
+    filterable: true
+    expression: null
+    description: null
+    python_date_format: null
+    extra: null
+  - column_name: last_category
+    verbose_name: null
+    is_dttm: false
+    is_active: true
+    type: TEXT
+    advanced_data_type: null
+    groupby: true
+    filterable: true
+    expression: null
+    description: null
+    python_date_format: null
+    extra: null
+  - column_name: customers_count
+    verbose_name: null
+    is_dttm: false
+    is_active: true
+    type: BIGINT
+    advanced_data_type: null
+    groupby: true
+    filterable: true
+    expression: null
+    description: null
+    python_date_format: null
+    extra: null
+  - column_name: migration_percent
+    verbose_name: null
+    is_dttm: false
+    is_active: true
+    type: NUMERIC(14, 2)
+    advanced_data_type: null
+    groupby: true
+    filterable: true
+    expression: null
+    description: null
+    python_date_format: null
+    extra: null
+  - column_name: category_stability_percent
+    verbose_name: null
+    is_dttm: false
+    is_active: true
+    type: NUMERIC(14, 2)
+    advanced_data_type: null
+    groupby: true
+    filterable: true
+    expression: null
+    description: null
+    python_date_format: null
+    extra: null
+version: 1.0.0

@@ -12,10 +12,11 @@ _PRIMARY_QUERY = text("SELECT * FROM feature.recsys WHERE user_id = :uid LIMIT 1
 
 _FALLBACK_QUERY = text(
     """
-    SELECT user_id, orders_count, total_revenue, days_since_last_order,
-           recency_score, frequency_score, monetary_score
-    FROM mart.customer_360
-    WHERE user_id = :uid
+    SELECT c.user_id, c.orders_count, c.total_revenue, c.days_since_last_order,
+           r.recency_score, r.frequency_score, r.monetary_score
+    FROM mart.customer_360 c
+    LEFT JOIN mart.rfm r USING (user_id)
+    WHERE c.user_id = :uid
     LIMIT 1
     """
 )
@@ -33,7 +34,7 @@ class RecommendationsFeatureRepositoryImpl:
                     logger.debug("feature_source=feature.recsys user_id=%s", user_id)
                     return RecommendationsUserFeatures(**dict(row))
             except ProgrammingError:
-                pass
+                conn.rollback()
 
             row = conn.execute(_FALLBACK_QUERY, {"uid": user_id}).mappings().one_or_none()
             if row is None:

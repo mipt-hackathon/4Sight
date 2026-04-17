@@ -1,0 +1,34 @@
+slice_name: "XYZ: Товары по стабильности спроса"
+description: Распределение товаров по XYZ-категориям спроса.
+certified_by: null
+certification_details: null
+viz_type: dist_bar
+params:
+  adhoc_filters: []
+  bar_stacked: false
+  bottom_margin: auto
+  color_scheme: supersetColors
+  columns: []
+  contribution: false
+  datasource: 3__table
+  groupby:
+    - xyz_category
+  metrics:
+    - count
+  order_bars: true
+  queryFields:
+    columns: groupby
+    groupby: groupby
+    metrics: metrics
+  row_limit: 100
+  show_bar_value: false
+  show_controls: true
+  show_legend: false
+  viz_type: dist_bar
+  x_axis_label: XYZ категория
+  x_ticks_layout: flat
+  y_axis_format: SMART_NUMBER
+cache_timeout: null
+uuid: 93f8d156-d284-4c09-90f1-3b955ef49a04
+version: 1.0.0
+dataset_uuid: 575b1255-8b7a-43a1-a7eb-d780c50e3f72

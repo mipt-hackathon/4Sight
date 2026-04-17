@@ -52,6 +52,7 @@ services:
     volumes:
       - ./apps/backend:/workspace/apps/backend
       - ./libs/common:/workspace/libs/common
+      - ./tests:/workspace/tests
     depends_on:
       postgres:
         condition: service_healthy
@@ -72,12 +73,14 @@ services:
       ALEMBIC_DATABASE_URL: ${ALEMBIC_DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
       BI_READONLY_USER: ${BI_READONLY_USER:-bi_readonly}
+      ML_API_BASE_URL: ${ML_API_BASE_URL:-http://ml-api:8001}
       PYTHONPATH: /workspace/libs/common/src
     ports:
       - "${BACKEND_PORT}:8000"
     volumes:
       - ./apps/backend:/workspace/apps/backend
       - ./libs/common:/workspace/libs/common
+      - ./tests:/workspace/tests
     depends_on:
       postgres:
         condition: service_healthy
@@ -126,6 +129,7 @@ services:
     environment:
       NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
       NEXT_PUBLIC_ML_API_URL: ${NEXT_PUBLIC_ML_API_URL}
+      BACKEND_INTERNAL_URL: ${BACKEND_INTERNAL_URL:-http://backend:8000}
       CHOKIDAR_USEPOLLING: "true"
     ports:
       - "${FRONTEND_PORT}:3000"
@@ -157,6 +161,12 @@ services:
       - "${SUPERSET_PORT}:8088"
     volumes:
       - superset_home:/app/superset_home
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8088/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     depends_on:
       postgres:
         condition: service_healthy

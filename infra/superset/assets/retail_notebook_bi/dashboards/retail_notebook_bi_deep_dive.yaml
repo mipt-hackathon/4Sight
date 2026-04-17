@@ -1,0 +1,346 @@
+dashboard_title: "Retail Notebook BI Deep Dive"
+description: "Недостающие notebook-backed графики по логистике, месячной динамике и merchandise-мартам."
+css: null
+slug: retail-notebook-bi-deep-dive
+certified_by: null
+certification_details: null
+published: true
+uuid: 1d4f91f1-44be-4e92-8a62-2fa3808056f4
+position:
+  DASHBOARD_VERSION_KEY: v2
+  ROOT_ID:
+    children:
+      - GRID_ID
+    id: ROOT_ID
+    type: ROOT
+  GRID_ID:
+    children:
+      - ROW-DEEP-1
+      - ROW-DEEP-2
+      - ROW-DEEP-3
+      - ROW-DEEP-4
+      - ROW-DEEP-5
+      - ROW-DEEP-6
+      - ROW-DEEP-7
+      - ROW-DEEP-8
+      - ROW-DEEP-9
+      - ROW-DEEP-10
+      - ROW-DEEP-11
+    id: GRID_ID
+    parents:
+      - ROOT_ID
+    type: GRID
+  HEADER_ID:
+    id: HEADER_ID
+    meta:
+      text: Retail Notebook BI Deep Dive
+    type: HEADER
+  CHART-CUSTOMER-ABC-SHARE:
+    children: []
+    id: CHART-CUSTOMER-ABC-SHARE
+    meta:
+      chartId: 1012
+      height: 45
+      sliceName: "ABC: Доля выручки по клиентским категориям"
+      uuid: cda1c9fd-70bb-4168-b8cc-f70bbd406140
+      width: 6
+    type: CHART
+  CHART-ABCXYZ-PERCENT:
+    children: []
+    id: CHART-ABCXYZ-PERCENT
+    meta:
+      chartId: 1013
+      height: 45
+      sliceName: "ABC-XYZ: Матрица выручки по строкам (%)"
+      uuid: d7b0c9ba-4d9f-49ba-b51c-b3d4ee3bc84b
+      width: 6
+    type: CHART
+  CHART-PRODUCT-XYZ:
+    children: []
+    id: CHART-PRODUCT-XYZ
+    meta:
+      chartId: 1014
+      height: 45
+      sliceName: "XYZ: Товары по стабильности спроса"
+      uuid: 93f8d156-d284-4c09-90f1-3b955ef49a04
+      width: 6
+    type: CHART
+  CHART-REGION-ABC:
+    children: []
+    id: CHART-REGION-ABC
+    meta:
+      chartId: 1015
+      height: 45
+      sliceName: "ABC: Топ-15 регионов по выручке"
+      uuid: 2d53a12b-2826-4e08-abb2-aa3c82114400
+      width: 6
+    type: CHART
+  CHART-RETURNS-XYZ:
+    children: []
+    id: CHART-RETURNS-XYZ
+    meta:
+      chartId: 1016
+      height: 45
+      sliceName: "XYZ: Стабильность возвратов"
+      uuid: 615b88f9-a69f-4c0a-a0ba-73bee3e68caf
+      width: 6
+    type: CHART
+  CHART-DELIVERY-RETURNS:
+    children: []
+    id: CHART-DELIVERY-RETURNS
+    meta:
+      chartId: 1017
+      height: 45
+      sliceName: "Логистика: Доставка vs возвраты"
+      uuid: 0c727f90-737c-4f0f-a1ef-37fb43ae91e6
+      width: 6
+    type: CHART
+  CHART-CHURN-RETURNS:
+    children: []
+    id: CHART-CHURN-RETURNS
+    meta:
+      chartId: 1018
+      height: 45
+      sliceName: "Отток: по категориям возвратов"
+      uuid: 60a4b33a-9032-4ef3-b791-c17b5e10a7f7
+      width: 6
+    type: CHART
+  CHART-CHURN-DELIVERY:
+    children: []
+    id: CHART-CHURN-DELIVERY
+    meta:
+      chartId: 1019
+      height: 45
+      sliceName: "Отток: по категориям доставки"
+      uuid: e5879788-6434-4bdc-aa26-7ca587234701
+      width: 6
+    type: CHART
+  CHART-CHURN-MATRIX:
+    children: []
+    id: CHART-CHURN-MATRIX
+    meta:
+      chartId: 1020
+      height: 45
+      sliceName: "Отток: Доставка vs возвраты"
+      uuid: db624baf-069f-479e-bb35-650a9704344e
+      width: 6
+    type: CHART
+  CHART-RFM-CHURN:
+    children: []
+    id: CHART-RFM-CHURN
+    meta:
+      chartId: 1021
+      height: 45
+      sliceName: "RFM: Уровень оттока по сегментам"
+      uuid: ac386bc1-24f1-4a35-b883-bb3547b14fe9
+      width: 6
+    type: CHART
+  CHART-MONTHLY-COUNTS:
+    children: []
+    id: CHART-MONTHLY-COUNTS
+    meta:
+      chartId: 1022
+      height: 45
+      sliceName: "ABC: Динамика количества клиентов по месяцам"
+      uuid: afcd5571-3f31-4738-95e2-de170faa8fe7
+      width: 6
+    type: CHART
+  CHART-MONTHLY-SHARE:
+    children: []
+    id: CHART-MONTHLY-SHARE
+    meta:
+      chartId: 1023
+      height: 45
+      sliceName: "ABC: Доля клиентов по месяцам (%)"
+      uuid: 48d840b4-368f-4150-981f-89ecf174570e
+      width: 6
+    type: CHART
+  CHART-CATEGORY-MIGRATION:
+    children: []
+    id: CHART-CATEGORY-MIGRATION
+    meta:
+      chartId: 1024
+      height: 45
+      sliceName: "ABC: Матрица миграции категорий"
+      uuid: 85b16186-0875-4f74-b208-76f340ff563d
+      width: 6
+    type: CHART
+  CHART-CATEGORY-STABILITY:
+    children: []
+    id: CHART-CATEGORY-STABILITY
+    meta:
+      chartId: 1025
+      height: 45
+      sliceName: "ABC: Стабильность категорий"
+      uuid: 24a6d4cb-999a-44aa-a74c-082936509753
+      width: 6
+    type: CHART
+  CHART-CATEGORY-RANKING:
+    children: []
+    id: CHART-CATEGORY-RANKING
+    meta:
+      chartId: 1026
+      height: 45
+      sliceName: "ABC: Категории товаров по выручке"
+      uuid: 4d0d8eca-90b2-4371-9415-687221e269b4
+      width: 6
+    type: CHART
+  CHART-CATEGORY-SHARE:
+    children: []
+    id: CHART-CATEGORY-SHARE
+    meta:
+      chartId: 1027
+      height: 45
+      sliceName: "ABC: Доля выручки по категориям товаров"
+      uuid: ab67ab4b-0518-4ce1-9969-eef261919733
+      width: 6
+    type: CHART
+  CHART-BRAND-RANKING:
+    children: []
+    id: CHART-BRAND-RANKING
+    meta:
+      chartId: 1028
+      height: 45
+      sliceName: "ABC: Бренды по выручке"
+      uuid: 4b9635b0-b82c-4b75-b096-499deea13b5e
+      width: 6
+    type: CHART
+  CHART-BRAND-SHARE:
+    children: []
+    id: CHART-BRAND-SHARE
+    meta:
+      chartId: 1029
+      height: 45
+      sliceName: "ABC: Доля выручки по брендам"
+      uuid: 901650d5-7a45-4a09-82f4-172b903ff22f
+      width: 6
+    type: CHART
+  CHART-ABCXYZ-CORRECTED-MATRIX:
+    children: []
+    id: CHART-ABCXYZ-CORRECTED-MATRIX
+    meta:
+      chartId: 1030
+      height: 45
+      sliceName: "ABC-XYZ: Матрица суммы показателя"
+      uuid: 3cc5916b-0fdf-45ff-afb8-c6d5ca814930
+      width: 6
+    type: CHART
+  CHART-ABCXYZ-OBJECTS:
+    children: []
+    id: CHART-ABCXYZ-OBJECTS
+    meta:
+      chartId: 1031
+      height: 45
+      sliceName: "ABC-XYZ: Распределение объектов по XYZ категориям"
+      uuid: 99423618-6fda-419b-b72b-57e04b233b1f
+      width: 6
+    type: CHART
+  CHART-ABCXYZ-CV:
+    children: []
+    id: CHART-ABCXYZ-CV
+    meta:
+      chartId: 1032
+      height: 45
+      sliceName: "ABC-XYZ: Распределение коэффициента вариации"
+      uuid: 14cae5b4-57b3-4992-803c-691c19b2615e
+      width: 6
+    type: CHART
+  CHART-ABCXYZ-TIMESERIES:
+    children: []
+    id: CHART-ABCXYZ-TIMESERIES
+    meta:
+      chartId: 1033
+      height: 45
+      sliceName: "ABC-XYZ: Примеры временных рядов"
+      uuid: ae890463-b840-46f4-91b3-6356b7c0b029
+      width: 6
+    type: CHART
+  ROW-DEEP-1:
+    children:
+      - CHART-CUSTOMER-ABC-SHARE
+      - CHART-ABCXYZ-PERCENT
+    id: ROW-DEEP-1
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+  ROW-DEEP-2:
+    children:
+      - CHART-PRODUCT-XYZ
+      - CHART-REGION-ABC
+    id: ROW-DEEP-2
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+  ROW-DEEP-3:
+    children:
+      - CHART-RETURNS-XYZ
+      - CHART-DELIVERY-RETURNS
+    id: ROW-DEEP-3
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+  ROW-DEEP-4:
+    children:
+      - CHART-CHURN-RETURNS
+      - CHART-CHURN-DELIVERY
+    id: ROW-DEEP-4
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+  ROW-DEEP-5:
+    children:
+      - CHART-CHURN-MATRIX
+      - CHART-RFM-CHURN
+    id: ROW-DEEP-5
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+  ROW-DEEP-6:
+    children:
+      - CHART-MONTHLY-COUNTS
+      - CHART-MONTHLY-SHARE
+    id: ROW-DEEP-6
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+  ROW-DEEP-7:
+    children:
+      - CHART-CATEGORY-MIGRATION
+      - CHART-CATEGORY-STABILITY
+    id: ROW-DEEP-7
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+  ROW-DEEP-8:
+    children:
+      - CHART-CATEGORY-RANKING
+      - CHART-CATEGORY-SHARE
+    id: ROW-DEEP-8
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+  ROW-DEEP-9:
+    children:
+      - CHART-BRAND-RANKING
+      - CHART-BRAND-SHARE
+    id: ROW-DEEP-9
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+  ROW-DEEP-10:
+    children:
+      - CHART-ABCXYZ-CORRECTED-MATRIX
+      - CHART-ABCXYZ-OBJECTS
+    id: ROW-DEEP-10
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+  ROW-DEEP-11:
+    children:
+      - CHART-ABCXYZ-CV
+      - CHART-ABCXYZ-TIMESERIES
+    id: ROW-DEEP-11
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+version: 1.0.0

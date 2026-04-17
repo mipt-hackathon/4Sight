@@ -1,0 +1,36 @@
+slice_name: "ABC: Динамика количества клиентов по месяцам"
+description: Динамика количества клиентов по ежемесячным ABC-категориям.
+certified_by: null
+certification_details: null
+viz_type: dist_bar
+params:
+  adhoc_filters: []
+  bar_stacked: false
+  bottom_margin: auto
+  color_scheme: supersetColors
+  columns: []
+  contribution: false
+  datasource: 7__table
+  groupby:
+    - year_month
+  metrics:
+    - a_customers_sum
+    - b_customers_sum
+    - c_customers_sum
+  order_bars: false
+  queryFields:
+    columns: groupby
+    groupby: groupby
+    metrics: metrics
+  row_limit: 1000
+  show_bar_value: false
+  show_controls: true
+  show_legend: true
+  viz_type: dist_bar
+  x_axis_label: Месяц
+  x_ticks_layout: staggered
+  y_axis_format: SMART_NUMBER
+cache_timeout: null
+uuid: afcd5571-3f31-4738-95e2-de170faa8fe7
+version: 1.0.0
+dataset_uuid: 44ae6479-ec5b-4b98-8bba-bee84cd32daf
