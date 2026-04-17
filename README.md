@@ -3,6 +3,12 @@
 ## Отчеты для сдачи черновика решения
 - [ML API](./docs/reports//ml_api_report_draft.md)
 
+### Superset
+
+- Локальный URL: `http://localhost:18088/superset/dashboard/retail-notebook-bi-deep-dive/`
+- Что показывает: customer ABC/XYZ, RFM, churn by segments, логистику и возвраты, продуктовый и региональный ABC-анализ
+- Скриншот: [retail-notebook-bi-deep-dive-2026-04-17T08-32-20.364Z.jpg](./docs/superset/retail-notebook-bi-deep-dive-2026-04-17T08-32-20.364Z.jpg)
+
 ## Архитектура решения
 ```mermaid
 flowchart LR
