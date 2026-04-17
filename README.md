@@ -5,8 +5,6 @@
 
 ## Архитектура решения
 ```mermaid
-
-
 flowchart LR
     data_csv["data.csv"] --> etl["jobs/ etl
     parsers / validators / extract / transform / load to db"]
@@ -37,7 +35,6 @@ flowchart LR
 - batch/jobs,
 - SQL-слой для `clean / mart / feature / serving`,
 - локальная инфраструктура через Docker Compose.
-
 В проекте намеренно не используется отдельный task runner. Все основные сценарии ниже описаны прямыми командами `docker compose`, чтобы workflow был одинаково понятен на Windows, macOS и Linux.
 Docker Compose по умолчанию читает `.env` из корня репозитория, поэтому отдельный `--env-file .env` в командах не нужен.
 
