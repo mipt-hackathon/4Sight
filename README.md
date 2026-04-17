@@ -1,5 +1,35 @@
 # Retail Analytics Hackathon Monorepo
 
+## Отчеты для сдачи черновика решения
+- [ML API](./docs/reports//ml_api_report_draft.md)
+
+## Архитектура решения
+```mermaid
+
+
+flowchart LR
+    data_csv["data.csv"] --> etl["jobs/ etl
+    parsers / validators / extract / transform / load to db"]
+    events_csv["events.csv"] --> etl
+    etl --> clean["PostgreSQL очищенные таблички"]
+    clean --> marts["jobs/marts_builder"]
+
+    marts --> mart["PostgreSQL: витринные таблички"]
+    mart --> features_job["jobs/feature_builder"] & backend["apps/backend"] & superset["Superset"]
+    features_job --> feature["PostgreSQL: таблички с дополнительными показателями (под ML)"]
+    feature --> train["jobs/train"] & batch["jobs/batch_scoring"] & mlapi["apps/ml_api"]
+    train --> artifacts["artifacts/models/*"]
+    artifacts --> batch & mlapi
+
+    batch --> serving["PostgreSQL: итоговые таблички"]
+    serving --> backend & superset
+    backend --> frontend["apps/frontend"]
+    mlapi <---> backend
+```
+
+---
+## Общее описание решения и репозитория
+
 Это монорепо для хакатонного проекта по retail analytics. Здесь разделены:
 - продуктовый backend,
 - отдельный ML API,
