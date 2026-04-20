@@ -10,6 +10,7 @@ superset fab create-admin \
   --password "${SUPERSET_ADMIN_PASSWORD}" || true
 superset init
 superset import-directory -o -f /app/docker/assets/retail_notebook_bi
+python /app/docker/remove_deprecated_charts.py
 python /app/docker/normalize_bar_chart_query_contexts.py
 python - <<'PY'
 from superset.app import create_app
@@ -68,8 +69,8 @@ with app.app_context():
         raise SystemExit(
             f"Superset seed import incomplete: expected mart datasets missing, got={sorted(target_datasets)}"
         )
-    if chart_count < 33:
-        raise SystemExit(f"Superset seed import incomplete: expected at least 33 charts, got={chart_count}")
+    if chart_count < 31:
+        raise SystemExit(f"Superset seed import incomplete: expected at least 31 charts, got={chart_count}")
     if {"retail-notebook-bi", "retail-notebook-bi-deep-dive"} - target_dashboards:
         raise SystemExit(
             f"Superset seed import incomplete: expected dashboards missing, got={sorted(target_dashboards)}"

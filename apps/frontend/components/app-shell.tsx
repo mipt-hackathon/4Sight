@@ -23,6 +23,7 @@ import {
   IconChartLine,
   IconDashboard,
   IconHome2,
+  IconLayoutDashboard,
   IconPresentationAnalytics,
   IconSparkles,
   IconUserCircle,
@@ -41,6 +42,12 @@ const navigation = [
     label: "KPI",
     hint: "Продажи и здоровье базы",
     icon: IconDashboard,
+  },
+  {
+    href: "/deep-dive",
+    label: "BI Deep Dive",
+    hint: "Встроенный Superset",
+    icon: IconLayoutDashboard,
   },
   {
     href: "/churn",
@@ -85,6 +92,7 @@ type AppShellProps = {
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
   const [opened, { toggle, close }] = useDisclosure(false);
+  const isDeepDivePage = pathname === "/deep-dive";
 
   return (
     <MantineAppShell
@@ -127,28 +135,12 @@ export function AppShell({ children }: AppShellProps) {
               </Group>
             </Link>
           </Group>
-          <Badge variant="light" color="sand.7" visibleFrom="sm">
-            Superset остаётся отдельным BI-контуром
-          </Badge>
         </Group>
       </MantineAppShell.Header>
 
       <MantineAppShell.Navbar p="md">
         <ScrollArea type="never" style={{ height: "100%" }}>
           <Stack gap="md" h="100%">
-            <Paper withBorder radius="xl" p="md" bg="rgba(255, 250, 243, 0.94)">
-              <Stack gap="xs">
-                <Group gap="sm">
-                  <IconPresentationAnalytics size={18} color="#0f766e" />
-                  <Text fw={700}>Один сценарий вместо BI-конструктора</Text>
-                </Group>
-                <Text size="sm" c="dimmed">
-                  Фронт показывает клиентский цикл: аналитика, churn-сигнал,
-                  рекомендация и действие.
-                </Text>
-              </Stack>
-            </Paper>
-            <Divider />
             <Stack gap={6} style={{ flex: 1 }}>
               {navigation.map((item) => {
                 const Icon = item.icon;
@@ -174,21 +166,15 @@ export function AppShell({ children }: AppShellProps) {
                 );
               })}
             </Stack>
-            <Paper withBorder radius="xl" p="md" bg="rgba(15, 118, 110, 0.07)">
-              <Stack gap={6}>
-                <Text fw={700}>Что здесь важно</Text>
-                <Text size="sm" c="dimmed">
-                  Никаких ad hoc дашбордов. Только product-facing экраны для
-                  демонстрации бизнес-сценария.
-                </Text>
-              </Stack>
-            </Paper>
           </Stack>
         </ScrollArea>
       </MantineAppShell.Navbar>
 
       <MantineAppShell.Main>
-        <Box maw={1440} mx="auto">
+        <Box
+          maw={isDeepDivePage ? "none" : 1440}
+          mx={isDeepDivePage ? 0 : "auto"}
+        >
           {children}
         </Box>
       </MantineAppShell.Main>

@@ -222,6 +222,15 @@ export type SegmentsResponse = {
   items: SegmentBreakdownItem[];
 };
 
+export type SupersetDeepDiveEmbedResponse = {
+  dashboard_slug: string;
+  dashboard_title: string;
+  dashboard_url: string;
+  superset_domain: string;
+  embedded_id: string;
+  guest_token: string;
+};
+
 function resolveBackendBaseUrl(): string {
   return typeof window === "undefined"
     ? env.backendInternalUrl
@@ -328,5 +337,8 @@ export const apiClient = {
   },
   getSegments() {
     return fetchJson<SegmentsResponse>("/api/segments");
+  },
+  getSupersetDeepDiveEmbed() {
+    return fetchJson<SupersetDeepDiveEmbedResponse>("/api/bi/deep-dive/embed");
   },
 };

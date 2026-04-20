@@ -46,13 +46,7 @@ export function HomeView({ overview, highRisk }: HomeViewProps) {
       <PageHero
         eyebrow="Product MVP"
         title="Единый экран удержания: сигнал, риск, действие."
-        description={
-          <>
-            Этот фронт не заменяет Superset. Он собирает в один сценарий
-            витрины, churn-сигнал и retention-рекомендации, чтобы показать, как
-            бизнес работает с клиентом, а не как аналитик строит ad hoc графики.
-          </>
-        }
+        description={<></>}
         aside={
           <SimpleGrid cols={1} spacing="md">
             <MetricTile

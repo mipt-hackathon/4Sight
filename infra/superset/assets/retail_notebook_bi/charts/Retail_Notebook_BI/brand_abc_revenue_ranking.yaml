@@ -2,32 +2,39 @@ slice_name: "ABC: Бренды по выручке"
 description: Ранжирование брендов по выручке.
 certified_by: null
 certification_details: null
-viz_type: dist_bar
+viz_type: echarts_timeseries_bar
 params:
   adhoc_filters: []
-  bar_stacked: false
-  bottom_margin: auto
+  annotation_layers: []
   color_scheme: supersetColors
-  columns: []
-  contribution: false
+  comparison_type: values
+  contributionMode: null
   datasource: 10__table
-  groupby:
-    - brand
+  groupby: []
+  markerEnabled: false
   metrics:
     - total_revenue_sum
+  orientation: horizontal
   order_bars: true
   queryFields:
     columns: groupby
     groupby: groupby
     metrics: metrics
   row_limit: 20
-  show_bar_value: false
-  show_controls: true
+  show_extra_controls: false
   show_legend: false
-  viz_type: dist_bar
-  x_axis_label: Бренд
-  x_ticks_layout: staggered
+  show_value: false
+  stack: null
+  truncateXAxis: false
+  truncateYAxis: false
+  viz_type: echarts_timeseries_bar
+  x_axis: brand
+  x_axis_title: Выручка
+  x_axis_title_margin: 30
+  y_axis_title: Бренд
+  y_axis_title_margin: 0
   y_axis_format: SMART_NUMBER
+  zoomable: false
 cache_timeout: null
 uuid: 4b9635b0-b82c-4b75-b096-499deea13b5e
 version: 1.0.0
