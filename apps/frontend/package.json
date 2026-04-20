@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@superset-ui/embedded-sdk": "^0.1.0",
     "@mantine/core": "^7.17.4",
     "@mantine/hooks": "^7.17.4",
     "@tabler/icons-react": "^3.34.0",

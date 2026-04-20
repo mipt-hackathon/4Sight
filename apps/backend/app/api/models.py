@@ -226,3 +226,12 @@ class SalesForecastResponse(BaseModel):
 class SegmentsResponse(BaseModel):
     generated_at: datetime
     items: list[SegmentBreakdownItem]
+
+
+class SupersetDeepDiveEmbedResponse(BaseModel):
+    dashboard_slug: str
+    dashboard_title: str
+    dashboard_url: str
+    superset_domain: str
+    embedded_id: str
+    guest_token: str

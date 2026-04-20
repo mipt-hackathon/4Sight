@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.router import api_router
 from app.core.config import get_backend_settings
+from app.integrations.superset_client import SupersetClientError
 from app.repositories.analytics_repository import AnalyticsDataUnavailableError
 
 
@@ -23,10 +24,16 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         base_url=settings.ml_api_base_url.rstrip("/"),
         timeout=settings.ml_api_timeout_seconds,
     )
+    app.state.superset_http_client = httpx.Client(
+        base_url=settings.superset_internal_url.rstrip("/"),
+        timeout=settings.superset_api_timeout_seconds,
+        follow_redirects=True,
+    )
 
     yield
 
     app.state.ml_api_http_client.close()
+    app.state.superset_http_client.close()
     app.state.db_engine.dispose()
 
 
@@ -60,6 +67,21 @@ def create_app() -> FastAPI:
             content={
                 "error_code": "DATA_NOT_READY",
                 "detail": str(exc),
+                "path": str(request.url.path),
+            },
+        )
+
+    @application.exception_handler(SupersetClientError)
+    async def superset_client_error_handler(
+        request: Request,
+        exc: SupersetClientError,
+    ) -> JSONResponse:
+        status_code = 503 if exc.error_code == "UPSTREAM_UNAVAILABLE" else 502
+        return JSONResponse(
+            status_code=status_code,
+            content={
+                "error_code": exc.error_code,
+                "detail": exc.message,
                 "path": str(request.url.path),
             },
         )

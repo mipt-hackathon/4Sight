@@ -23,6 +23,7 @@ import {
   IconChartLine,
   IconDashboard,
   IconHome2,
+  IconLayoutDashboard,
   IconPresentationAnalytics,
   IconSparkles,
   IconUserCircle,
@@ -41,6 +42,12 @@ const navigation = [
     label: "KPI",
     hint: "Продажи и здоровье базы",
     icon: IconDashboard,
+  },
+  {
+    href: "/deep-dive",
+    label: "BI Deep Dive",
+    hint: "Встроенный Superset",
+    icon: IconLayoutDashboard,
   },
   {
     href: "/churn",
@@ -85,6 +92,7 @@ type AppShellProps = {
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
   const [opened, { toggle, close }] = useDisclosure(false);
+  const isDeepDivePage = pathname === "/deep-dive";
 
   return (
     <MantineAppShell
@@ -127,9 +135,6 @@ export function AppShell({ children }: AppShellProps) {
               </Group>
             </Link>
           </Group>
-          <Badge variant="light" color="sand.7" visibleFrom="sm">
-            Superset остаётся отдельным BI-контуром
-          </Badge>
         </Group>
       </MantineAppShell.Header>
 
@@ -188,7 +193,10 @@ export function AppShell({ children }: AppShellProps) {
       </MantineAppShell.Navbar>
 
       <MantineAppShell.Main>
-        <Box maw={1440} mx="auto">
+        <Box
+          maw={isDeepDivePage ? "none" : 1440}
+          mx={isDeepDivePage ? 0 : "auto"}
+        >
           {children}
         </Box>
       </MantineAppShell.Main>
