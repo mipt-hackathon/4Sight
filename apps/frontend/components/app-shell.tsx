@@ -141,19 +141,6 @@ export function AppShell({ children }: AppShellProps) {
       <MantineAppShell.Navbar p="md">
         <ScrollArea type="never" style={{ height: "100%" }}>
           <Stack gap="md" h="100%">
-            <Paper withBorder radius="xl" p="md" bg="rgba(255, 250, 243, 0.94)">
-              <Stack gap="xs">
-                <Group gap="sm">
-                  <IconPresentationAnalytics size={18} color="#0f766e" />
-                  <Text fw={700}>Один сценарий вместо BI-конструктора</Text>
-                </Group>
-                <Text size="sm" c="dimmed">
-                  Фронт показывает клиентский цикл: аналитика, churn-сигнал,
-                  рекомендация и действие.
-                </Text>
-              </Stack>
-            </Paper>
-            <Divider />
             <Stack gap={6} style={{ flex: 1 }}>
               {navigation.map((item) => {
                 const Icon = item.icon;
@@ -179,15 +166,6 @@ export function AppShell({ children }: AppShellProps) {
                 );
               })}
             </Stack>
-            <Paper withBorder radius="xl" p="md" bg="rgba(15, 118, 110, 0.07)">
-              <Stack gap={6}>
-                <Text fw={700}>Что здесь важно</Text>
-                <Text size="sm" c="dimmed">
-                  Никаких ad hoc дашбордов. Только product-facing экраны для
-                  демонстрации бизнес-сценария.
-                </Text>
-              </Stack>
-            </Paper>
           </Stack>
         </ScrollArea>
       </MantineAppShell.Navbar>

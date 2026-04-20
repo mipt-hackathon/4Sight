@@ -143,27 +143,7 @@ position:
       height: 45
       sliceName: "ABC: Динамика количества клиентов по месяцам"
       uuid: afcd5571-3f31-4738-95e2-de170faa8fe7
-      width: 6
-    type: CHART
-  CHART-MONTHLY-SHARE:
-    children: []
-    id: CHART-MONTHLY-SHARE
-    meta:
-      chartId: 1023
-      height: 45
-      sliceName: "ABC: Доля клиентов по месяцам (%)"
-      uuid: 48d840b4-368f-4150-981f-89ecf174570e
-      width: 6
-    type: CHART
-  CHART-CATEGORY-MIGRATION:
-    children: []
-    id: CHART-CATEGORY-MIGRATION
-    meta:
-      chartId: 1024
-      height: 45
-      sliceName: "ABC: Матрица миграции категорий"
-      uuid: 85b16186-0875-4f74-b208-76f340ff563d
-      width: 6
+      width: 12
     type: CHART
   CHART-CATEGORY-STABILITY:
     children: []
@@ -173,7 +153,7 @@ position:
       height: 45
       sliceName: "ABC: Стабильность категорий"
       uuid: 24a6d4cb-999a-44aa-a74c-082936509753
-      width: 6
+      width: 12
     type: CHART
   CHART-CATEGORY-RANKING:
     children: []
@@ -298,14 +278,12 @@ position:
   ROW-DEEP-6:
     children:
       - CHART-MONTHLY-COUNTS
-      - CHART-MONTHLY-SHARE
     id: ROW-DEEP-6
     meta:
       background: BACKGROUND_TRANSPARENT
     type: ROW
   ROW-DEEP-7:
     children:
-      - CHART-CATEGORY-MIGRATION
       - CHART-CATEGORY-STABILITY
     id: ROW-DEEP-7
     meta:

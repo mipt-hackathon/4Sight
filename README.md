@@ -6,7 +6,7 @@
 ### Superset
 
 - Что показывает: customer ABC/XYZ, RFM, churn by segments, логистику и возвраты, продуктовый и региональный ABC-анализ
-- Скриншот: [retail-notebook-bi-deep-dive-2026-04-17T08-32-20.364Z.jpg](./docs/superset/retail-notebook-bi-deep-dive-2026-04-17T08-32-20.364Z.jpg)
+- Скриншот: [retail-notebook-bi-deep-dive-2026-04-17T08-32-20.364Z.jpg](./docs/superset/retail-notebook-bi-deep-dive-2026-04-20T11-13-24.618Z)
 
 ## Архитектура решения
 ```mermaid

@@ -38,8 +38,25 @@ export function DeepDiveScreen() {
 
     let active = true;
     const mountPoint = mountRef.current;
+    let observer: MutationObserver | null = null;
     mountPoint.innerHTML = "";
     setEmbedError(null);
+
+    function stretchEmbeddedIframe() {
+      const iframe = mountPoint.querySelector("iframe");
+      if (!(iframe instanceof HTMLIFrameElement)) {
+        return;
+      }
+
+      iframe.style.display = "block";
+      iframe.style.width = "100%";
+      iframe.style.height = "100%";
+      iframe.style.minHeight = "100%";
+      iframe.style.border = "0";
+      iframe.style.background = "#fff";
+      iframe.setAttribute("width", "100%");
+      iframe.setAttribute("height", "100%");
+    }
 
     async function mountDashboard(embedConfig: SupersetDeepDiveEmbedResponse) {
       try {
@@ -62,6 +79,9 @@ export function DeepDiveScreen() {
             },
           },
         });
+        stretchEmbeddedIframe();
+        observer = new MutationObserver(stretchEmbeddedIframe);
+        observer.observe(mountPoint, { childList: true, subtree: true });
       } catch (nextError) {
         if (!active) {
           return;
@@ -78,6 +98,7 @@ export function DeepDiveScreen() {
 
     return () => {
       active = false;
+      observer?.disconnect();
       mountPoint.innerHTML = "";
     };
   }, [data]);
